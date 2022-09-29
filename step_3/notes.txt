@@ -1,0 +1,2 @@
+known =  non probabilistic for the algorithm, i mean niether is it.
+unknown = not known by the optimization algorithm
