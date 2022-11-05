@@ -12,6 +12,9 @@ class Users_group():
         # Alpha ratios is dirichlet distribution
         # First element is number of users that visit competitor website, 
         # and the rest is the number of users starting to browse the website on product 'i'
+
+        # TODO graph_weights diagonals must be 0
+        # TODO 2 types of graph
         self.graph_weights=graph_weights
         # Weighted adjacency matrix of the graph, size 5x5
         self.n_items_bought=n_items_bought
