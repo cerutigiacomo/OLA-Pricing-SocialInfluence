@@ -11,42 +11,30 @@ class Simulator():
         self.margins=margins
         self.lamb=lamb
         self.visited_primaries = []
-        
-    # def website_simulation(self,user_class):
-    # # THIS METHOD IS TO BE REWRITTEN FOR STEP 3 -7
-    # # This method simulates users visiting the ecommerce website
-    # # argument is an User class instance
-    # # returns total rewards for all five products
-
-    #     total_rewards=np.zeros(5,np.float16)
-
-    #     for j in range(len(user_class.n_users)-1):
-            
-    #         for n in range(round(user_class.n_users[j+1])):
-    #             self.visited_primaries=[]
-    #             rewards=self.simulation(j,user_class)
-    #             total_rewards += rewards
-
-    #         print(round(user_class.n_users[j+1]),"users landing on product", j+1 ,total_rewards)   
-        
-    #     return total_rewards
 
     def simulation(self,j,user_class):
-        # This recurisve method simulates one user landing on a webpage of one product. 
+        # This recursive method simulates one user landing on a webpage of one product.
         # Rewards depends on conversion rates, price point, number of items bought, and margins.
         # After adding to the rewards the money for the primary product, 
         # this method looks into the graph weights to give the most probable
         # secondary products and calls itself recursively to add the rewards of the next primary.
-
+        # TODO print a graph for every product were we see the orderer prices and the choosen one for the day
         
         # Compute reward for buying the primary
         rewards = np.zeros(5,np.float16)
-        conversion_factor=user_class.conv_rates[self.prices[j]][j]>npr.random()
+        # OLD CODE conversion_factor=user_class.conv_rates[j]>npr.random()
+        # Il fattore di conversione deve dire un'ipotetico presso massimo accettabile per quel topo di oggetto
+        # TODO how to use the conv_rates!
+        conversion_factor = user_class.conv_rates[j] > npr.random()
         rewards[j] = self.margins[self.prices[j]][j]*user_class.n_items_bought[self.prices[j]][j]*conversion_factor
         self.visited_primaries.append(j)
 
         arr = deepcopy(user_class.graph_weights)[j]
         arr[self.visited_primaries]=0.0
+        if(conversion_factor == False):
+            # Return if the user do not but any item of this product
+            return 0
+
 
         # Select 2 secondaries with highest observation rates and visit them if weights are positive.
         # If they are null, means they have already been visited.
@@ -64,11 +52,3 @@ class Simulator():
 
         # Returns the rewards of that user associated to products bought
         return rewards
-
-
-
-
-
-
-        
-

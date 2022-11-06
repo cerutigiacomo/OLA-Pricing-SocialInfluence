@@ -23,28 +23,41 @@ Other constraint:
 - Every day we have a random number of potential customer (visitor on the website) we do not consider old costumer
 - Every day we have a vector of ratio of users landing on an page where product x is primary
     - /alpha ratio are realizations of independent Dirichlet random variables. (every day it changes)
-    - The ratio are respet to the total number of users. [Why it say "In practice, you can only consider the 𝛼 ratios and disregard the total number of users."???]
+    ????
+    - [Call 𝛼_i the ratio of customers landing on the webpage in which product Pi is primary, and
+        call 𝛼_0 the ratio of customers landing on the webpage of a competitor.]
+    ????
+    - The ratio are respet to the total number of users.
+        ????
+        [Why it say "In practice, you can only consider the 𝛼 ratios and disregard the total number of users."]
+        ????
 - Consider two scenario:
     - The graph (vector of ratio) is fully connected and therefore all the edges have strictly positive probabilities
     - The graph (vector of ratio) is not fully connected and therefore some edges have zero probability.
     ?????
-    [The behavior of the user in the graph is similar to that of the social influence. Thus, in the following project proposals, you need to resort to social influence techniques to evaluate the probabilities with which the user reaches the webpage with some specific primary product.]
+    [The behavior of the user in the graph is similar to that of the social influence. Thus,
+    in the following project proposals, you need to resort to social influence techniques to evaluate
+    the probabilities with which the user reaches the webpage with some specific primary product.]
     ?????
 
 Our Scenario: Pricing
-- For every primary product, the pair and the order of the secondary products to display is fixed by the business unit and cannot be controlled
+- ????[For every primary product, the pair and the order of the secondary products to display
+    is fixed by the business unit and cannot be controlled]????
 - The price of every primary product is a variable to optimize.
 - The expected values of the 𝛼 ratios are known.
 
 - Assume that there are four values of price for every product and that the price can be changed once a day.
     - Every price is associated with a known margin.
-- For every product, the conversion probability associated with each price value is a random variable whose mean is unknown.
+- For every product, the conversion probability associated with each price value
+    is a random variable whose mean is unknown.
 
 STEPS
 
 1   Environment. Develop the simulator by Python. In doing that,
-    ????[imagine a motivating application and specify an opportune choice of the
-    probability distributions associated with every random variable.]????
+    ????
+    [imagine a motivating application and specify an opportune choice of the
+    probability distributions associated with every random variable.]
+    ????
     Moreover, assume that there are 2 binary features that define 3 different user classes.
     The users’ classes potentially differ for
         the demand curves of the 5 products,
