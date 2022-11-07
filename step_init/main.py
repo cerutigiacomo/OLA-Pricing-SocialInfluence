@@ -23,7 +23,7 @@ sim = Simulator(prices,margins,lamb)
             and on the 2nd dimension we have the different product
             Thn we select randomically [maybe normally or with another type of distribution can be better]
             the margin value considering the max_margin constant
-    Prices: tpye array [5,1], were we have stored the index of the selected margin for the day
+    Prices: type array [5,1], were we have stored the index of the selected margin for the day
         i think that a random distribution for choosing which between the already generated margin to use is correct.
 """
 
@@ -72,7 +72,7 @@ distribution option:
 max_prod_weight = 50
 product_weight = (npr.rand(numbers_of_products)*max_prod_weight).astype(int)
 product_weight[0] = max_prod_weight # [The competitor has higher weight !? ]
-alpha_ratios = npr.dirichlet(product_weight,3)
+alpha_ratios = npr.dirichlet(product_weight,users_classes)
 # ::6 ratios, the firs for the COMPETITOR webpage ?????
 """
 distribution option:  -   dirichlet (forced)

@@ -26,7 +26,7 @@ class Simulator():
         # Il fattore di conversione deve dire un'ipotetico presso massimo accettabile per quel topo di oggetto
         # TODO how to use the conv_rates!
         conversion_factor = user_class.conv_rates[j] > npr.random()
-        rewards[j] = self.margins[self.prices[j]][j]*user_class.n_items_bought[self.prices[j]][j]*conversion_factor
+        rewards[j] = self.margins[self.prices[j]][j]*user_class.n_items_bought[self.prices[j]][j]*conversion_factor#n_items_bought????
         self.visited_primaries.append(j)
 
         arr = deepcopy(user_class.graph_weights)[j]
@@ -38,7 +38,7 @@ class Simulator():
 
         # Select 2 secondaries with highest observation rates and visit them if weights are positive.
         # If they are null, means they have already been visited.
-        first_secondary = np.argmax(arr)
+        first_secondary = np.argmax(arr)# TODO use an observation vector for every product!
         if arr[first_secondary]>npr.random():
             # print("going to first secondary",first_secondary,"from prim",j)
             rewards +=self.simulation(first_secondary,user_class)

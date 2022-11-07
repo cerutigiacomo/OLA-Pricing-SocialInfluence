@@ -14,7 +14,7 @@ Constraint:
 - If the secondary product was not already visited there is a probability of click depending on the primary product
 - Probability to click on secondary product:
     - the purchase probability of the primary product
-    - Probability to observe the slot of the secondary product.
+    - Probability to observe?????? the slot of the secondary product.
     (See the graph on slide 2) -> gives the probability to click on a secondary product given the primary
     The user can click on both the secondary product (and open 2 page)
 - The number of items a user will buy is a random variable independent of any other variable
@@ -43,6 +43,8 @@ Other constraint:
 Our Scenario: Pricing
 - ????[For every primary product, the pair and the order of the secondary products to display
     is fixed by the business unit and cannot be controlled]????
+
+    they fix the "observable sceondary product"
 - The price of every primary product is a variable to optimize.
 - The expected values of the 𝛼 ratios are known.
 
