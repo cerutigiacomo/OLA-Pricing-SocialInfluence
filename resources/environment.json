@@ -1,0 +1,25 @@
+{
+  "simulator": {
+    "max_margin": 1,
+    "different_value_of_prices": 4,
+    "numbers_of_products": 5,
+    "lambda": 0.2
+  },
+  "users": {
+    "features": [
+      "babbo",
+      "ciccio",
+      "mammolo"
+    ],
+    "distributions": {
+      "max_item_bought": 5,
+      "max_users_per_class": 300,
+      "user_per_class_std": 5,
+      "min_conv_rates": 0.3,
+      "min_graph_probability": 0.4,
+      "n_items_bought_std": 2
+    },
+    "graph_weight_fully_connected": 0
+
+  }
+}
