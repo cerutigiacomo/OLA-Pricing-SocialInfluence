@@ -13,7 +13,7 @@ N_PRICES = 4
 ### does this make sense ? maybe not
 items = np.array([20,15,10,5,3,1])
 ### this is the n items bought corresponding to the index drawn by a random variable
-### price are increasing levels so it should be inverted from lower to higher
+### price are increasing levels so it is coherent to have higher numbers  of bought (lower price) to lower numbers (higher price)
 ###
 
 n=items.shape[0]-1
