@@ -3,6 +3,8 @@
     "max_margin": 1,
     "different_value_of_prices": 4,
     "numbers_of_products": 5,
+    "iteration_mean": 10,
+    "days": 365,
     "lambda": 0.2
   },
   "users": {

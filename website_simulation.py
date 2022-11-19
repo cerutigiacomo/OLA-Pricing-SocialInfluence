@@ -1,7 +1,11 @@
 import numpy as np
 import numpy.random as npr
-number_of_product = 5
+import json
 
+f = open('../resources/environment.json')
+data = json.load(f)
+numbers_of_products = data["simulator"]["numbers_of_products"]
+iteration = data["simulator"]["iteration_mean"]
 
 def website_simulation(sim, user_class):
     # This method simulates users visiting the ecommerce website
@@ -10,13 +14,18 @@ def website_simulation(sim, user_class):
 
     total_rewards = np.zeros(5, np.float16)
 
+    # return run_for_total_user(user_class, sim, total_rewards)
+    return run_for_alpha_ratio(user_class, sim, total_rewards)
+
+
+def run_for_total_user(user_class, sim, total_rewards):
     for i in range(user_class.total_users - 1):
         # Reward of the single product
         # product_reward = np.zeros(5, np.float16)
         # for n in range(round(user_class.total_users)):
         sim.visited_primaries = []
         # TODO select the correct product by using alpha probabilities
-        j = int(np.random.choice(number_of_product+1, 1, p=user_class.alpha))
+        j = int(np.random.choice(numbers_of_products+1, 1, p=user_class.alpha))
         if j == 0:
             # The competitor has been selected!
             continue
@@ -26,5 +35,20 @@ def website_simulation(sim, user_class):
 
         # total_rewards += product_reward
         # print(round(user_class.total_users[j+1]),"users landing on product", j+1 ,product_reward)
+        return total_rewards
+
+""" From the text
+
+"In practice, you can only consider the 𝛼 ratios and disregard the total number of users."
+"""
+def run_for_alpha_ratio(user_class, sim, total_rewards):
+    alpha = user_class.alpha
+    for i in range(numbers_of_products+1):
+        # i = 0 is the competitor
+        if i == 0:
+            continue
+        for j in range(int(alpha[i] * iteration)):
+            rewards = sim.simulation(i-1, user_class)
+            total_rewards += rewards
 
     return total_rewards
