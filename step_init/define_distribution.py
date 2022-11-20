@@ -109,7 +109,7 @@ def user_distribution():
     n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
     for i in classes.keys():
         max_item_bought = classes[i]["n_items_buyed"]["max_item_bought"]
-        n_items_bought[int(i)] = npr.random((different_value_of_prices, numbers_of_products)) * max_item_bought
+        n_items_bought[int(i)] = npr.uniform(0, max_item_bought, (different_value_of_prices, numbers_of_products)).astype(int)
 
     # n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
     # n_items_bought_std = data["users"]["distributions"]["n_items_bought_std"]

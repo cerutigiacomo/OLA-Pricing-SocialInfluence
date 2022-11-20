@@ -1,7 +1,8 @@
 {
   "simulator": {
     "days": 30,
-    "max_item_bought": 50
+    "max_item_bought": 15,
+    "max_users": 300
   },
   "product": {
     "max_margin": 1,
@@ -19,19 +20,19 @@
           "max_alpha": 0.8
         },
         "total_user": {
-          "mean_users_per_class": 30,
-          "user_per_class_std": 10
+          "mean_users_per_class": 200,
+          "user_per_class_std": 30
         },
         "demand": {
-          "min_demand": 0.3,
+          "min_demand": 0.4,
           "max_demand": 1
         },
         "n_items_buyed": {
-          "max_item_bought": 30
+          "max_item_bought": 5
         },
         "graph": {
-          "min_probability": 0.4,
-          "max_probability": 0.4
+          "min_probability": 0.6,
+          "max_probability": 1
         }
       },
       "1": {
@@ -42,19 +43,19 @@
           "max_alpha": 0.8
         },
         "total_user": {
-          "mean_users_per_class": 30,
+          "mean_users_per_class": 80,
           "user_per_class_std": 10
         },
         "demand": {
-          "min_demand": 0.3,
+          "min_demand": 0.8,
           "max_demand": 1
         },
         "n_items_buyed": {
-          "max_item_bought": 30
+          "max_item_bought": 15
         },
         "graph": {
-          "min_probability": 0.4,
-          "max_probability": 0.4
+          "min_probability": 0.2,
+          "max_probability": 0.8
         }
       },
       "2": {
@@ -65,19 +66,19 @@
           "max_alpha": 0.8
         },
         "total_user": {
-          "mean_users_per_class": 30,
-          "user_per_class_std": 10
+          "mean_users_per_class": 40,
+          "user_per_class_std": 5
         },
         "demand": {
-          "min_demand": 0.3,
+          "min_demand": 0.6,
           "max_demand": 1
         },
         "n_items_buyed": {
-          "max_item_bought": 30
+          "max_item_bought": 10
         },
         "graph": {
-          "min_probability": 0.4,
-          "max_probability": 0.4
+          "min_probability": 0.5,
+          "max_probability": 0.9
         }
       }
     },

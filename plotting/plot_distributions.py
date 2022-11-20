@@ -33,6 +33,7 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_ite
     axs[0, 0].set_xticks(list(range(users_classes)), list(range(1, 1 + users_classes)))
     axs[0, 0].set_title("Total users")
     axs[0, 0].grid()
+    axs[0, 0].set_ylim([0, data["simulator"]["max_users"]])
 
     for i in range(users_classes):
         axs[0, 1].plot(list(range(1 + numbers_of_products)), alpha_ratios[i], colors[i] + 'o', mfc='none',
@@ -58,7 +59,7 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_ite
         axs[2, i].set_yticks(list(range(1 + max_item_bought * 2)), list(range(1 + max_item_bought * 2)))
         axs[2, i].set_title("N items bought " + str(i))
         axs[2, i].grid()
-        axs[2, i].set_ylim([0, max_item_bought * 2])
+        axs[2, i].set_ylim([0, max_item_bought])
 
     for i in range(users_classes):
         axs[i, 3].plot(conv_rates[i], colors[i] + 'o-', mfc='none', label='class' + str(i))
