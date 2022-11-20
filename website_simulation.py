@@ -5,7 +5,6 @@ import json
 f = open('../resources/environment.json')
 data = json.load(f)
 numbers_of_products = data["simulator"]["numbers_of_products"]
-iteration = data["simulator"]["iteration_mean"]
 
 def website_simulation(sim, user_class):
     # This method simulates users visiting the ecommerce website
@@ -40,6 +39,7 @@ def run_for_total_user(user_class, sim, total_rewards):
 """ From the text
 
 "In practice, you can only consider the 𝛼 ratios and disregard the total number of users."
+We use the Alpha ratio and the total number of users. for iterating on the single product
 """
 def run_for_alpha_ratio(user_class, sim, total_rewards):
     alpha = user_class.alpha
@@ -47,7 +47,7 @@ def run_for_alpha_ratio(user_class, sim, total_rewards):
         # i = 0 is the competitor
         if i == 0:
             continue
-        for j in range(int(alpha[i] * iteration)):
+        for j in range(int(alpha[i] * user_class.total_users)):
             rewards = sim.simulation(i-1, user_class)
             total_rewards += rewards
 

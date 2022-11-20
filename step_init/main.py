@@ -32,8 +32,14 @@ def simulate_multiple_days(days):
         print("total revenue ", reward)
         plt.plot(list(range(numbers_of_products)), reward, 'o-', mfc='none')
         total_reward += reward
-        # Change the prices daily
+        # Change the prices, alpha, total_users daily
+        new_alpha = distribute_alpha()
+        new_total_users = distribute_total_user()
+        for i in range(users_classes):
+            users[i].alpha = new_alpha[i]
+            users[i].total_users = new_total_users[i]
         sim.prices = distribute_prices()
+
 
     plt.xlabel('Product')
     plt.ylabel('Reward')
@@ -59,7 +65,7 @@ total_users, alpha_ratios, graph, n_items_bought, conv_rates = user_distribution
 users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i])
          for i in range(users_classes)]
 
-# Plot simulator distributions
+# Plot distributions
 if debug_print_distribution:
     plot_simulator(margins, prices, secondary)
     plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_item_bought, conv_rates)

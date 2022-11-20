@@ -8,6 +8,7 @@ data = json.load(f)
 max_margin = data["simulator"]["max_margin"]
 different_value_of_prices = data["simulator"]["different_value_of_prices"]
 numbers_of_products = data["simulator"]["numbers_of_products"]
+users_classes = len(data["users"]["features"])
 
 
 def simulator_distribution():
@@ -49,9 +50,40 @@ def distribute_prices():
     return (npr.rand(numbers_of_products, 1) * different_value_of_prices).astype(int).reshape(numbers_of_products)
 
 
-def user_distribution():
+def distribute_alpha():
+    # TODO add dependency with the users class.
+    product_weight = (npr.uniform(0.4, 1, numbers_of_products + 1))
+    product_weight[0] = 0.5  # [The competitor has higher weight ! ]
+    alpha_ratios = npr.dirichlet(product_weight, users_classes)
+    # 6 ratios, the first is for the COMPETITOR webpage
+    """
+    distribution option:  -   dirichlet (forced)
+    distribution weights are chosen random.
+    """
+    return alpha_ratios
 
-    users_classes = len(data["users"]["features"])
+def distribute_total_user():
+    total_users = np.zeros(users_classes)
+    max_users_per_class = data["users"]["distributions"]["max_users_per_class"]
+    # Standard deviation of the user's distribution between classes
+    user_per_class_std = data["users"]["distributions"]["user_per_class_std"]
+
+    for i in range(users_classes):
+        # TODO not sure??
+        total_users[i] = (npr.normal(max_users_per_class,
+                                     user_per_class_std, 1)).astype(int)
+
+    # ::int array randomly from 0 to max_users_per_class
+    """
+    distribution option: 
+    -   Normal [i think can be a correct idea like implemented]
+    -   Random 
+    -   ....
+    the mean is a random variable from 0 to 300
+    the std is a random variable from 0 to 30
+    """
+
+def user_distribution():
 
     #                                           1 Create the demand curves (conversion rates)
     conv_rates = np.zeros((users_classes, numbers_of_products))
@@ -69,36 +101,10 @@ def user_distribution():
     """
 
     #                                           2 Create num of users
-    total_users = np.zeros(users_classes)
-    max_users_per_class = data["users"]["distributions"]["max_users_per_class"]
-    # Standard deviation of the user's distribution between classes
-    user_per_class_std = data["users"]["distributions"]["user_per_class_std"]
-
-    for i in range(users_classes):
-        # TODO not sure??
-        total_users[i] = (npr.normal(npr.random() * max_users_per_class,
-                                     npr.random() * user_per_class_std, 1)).astype(int)
-
-    # ::int array randomly from 0 to max_users_per_class
-    """
-    distribution option: 
-    -   Normal [i think can be a correct idea like implemented]
-    -   Random 
-    -   ....
-    the mean is a random variable from 0 to 300
-    the std is a random variable from 0 to 30
-    """
+    total_users = distribute_total_user()
 
     #                                           3 Create alpha ratios
-    # TODO add dependency with the users class.
-    product_weight = (npr.uniform(0.4, 1, numbers_of_products + 1))
-    product_weight[0] = 0.5  # [The competitor has higher weight ! ]
-    alpha_ratios = npr.dirichlet(product_weight, users_classes)
-    # 6 ratios, the first is for the COMPETITOR webpage
-    """
-    distribution option:  -   dirichlet (forced)
-    distribution weights are chosen random.
-    """
+    alpha_ratios = distribute_alpha()
 
     #                                           4 Create number of products sold
     max_item_bought = data["users"]["distributions"]["max_item_bought"]

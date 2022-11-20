@@ -3,20 +3,19 @@
     "max_margin": 1,
     "different_value_of_prices": 4,
     "numbers_of_products": 5,
-    "iteration_mean": 10,
-    "days": 365,
+    "days": 30,
     "lambda": 0.2
   },
   "users": {
     "features": [
-      "babbo",
-      "ciccio",
-      "mammolo"
+      "Studente",
+      "Operaio",
+      "Professore"
     ],
     "distributions": {
       "max_item_bought": 5,
-      "max_users_per_class": 300,
-      "user_per_class_std": 5,
+      "max_users_per_class": 30,
+      "user_per_class_std": 10,
       "min_conv_rates": 0.3,
       "min_graph_probability": 0.4,
       "n_items_bought_std": 2
