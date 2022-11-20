@@ -82,6 +82,7 @@ def distribute_total_user():
     the mean is a random variable from 0 to 300
     the std is a random variable from 0 to 30
     """
+    return total_users
 
 def user_distribution():
 
