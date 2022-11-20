@@ -4,7 +4,7 @@ import json
 
 f = open('../resources/environment.json')
 data = json.load(f)
-numbers_of_products = data["simulator"]["numbers_of_products"]
+numbers_of_products = data["product"]["numbers_of_products"]
 
 def website_simulation(sim, user_class):
     # This method simulates users visiting the ecommerce website

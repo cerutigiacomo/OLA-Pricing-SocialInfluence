@@ -5,10 +5,11 @@ import json
 
 f = open('../resources/environment.json')
 data = json.load(f)
-max_margin = data["simulator"]["max_margin"]
-different_value_of_prices = data["simulator"]["different_value_of_prices"]
-numbers_of_products = data["simulator"]["numbers_of_products"]
-users_classes = len(data["users"]["features"])
+max_margin = data["product"]["max_margin"]
+different_value_of_prices = data["product"]["different_value_of_prices"]
+numbers_of_products = data["product"]["numbers_of_products"]
+classes = data["users"]["classes"]
+users_classes = len(classes)
 
 
 def simulator_distribution():
@@ -28,23 +29,23 @@ def simulator_distribution():
         values = np.isin(secondary, list(range(numbers_of_products)))
         all_contained = values.all()
 
-    lamb = data["simulator"]["lambda"]  # LAMBDA
+    lamb = data["product"]["lambda"]  # LAMBDA
+
+    # EXPLANATION OF THE DISTRIBUTIONS
+    """
+        Firstly we set 3 constant
+            - max_margin: the maximum value of the margin value (not sure)
+            - different_value_of_prices: we have 4 values of prices for every product
+            - numbers_of_products: the website sell 5 different products
+    
+        Margin: type matrix [4,5], were on the 1st dimension we have the different prices per product
+                and on the 2nd dimension we have the different product
+                Thn we random select [maybe normally or with another type of distribution can be better]
+                the margin value considering the max_margin constant
+        Prices: type array [5,1], were we have stored the index of the selected margin for the day
+            i think that a random distribution for choosing which between the already generated margin to use is correct.
+    """
     return prices, margins, secondary
-
-# EXPLANATION OF THE DISTRIBUTIONS
-"""
-    Firstly we set 3 constant
-        - max_margin: the maximum value of the margin value (not sure)
-        - different_value_of_prices: we have 4 values of prices for every product
-        - numbers_of_products: the website sell 5 different products
-
-    Margin: type matrix [4,5], were on the 1st dimension we have the different prices per product
-            and on the 2nd dimension we have the different product
-            Thn we random select [maybe normally or with another type of distribution can be better]
-            the margin value considering the max_margin constant
-    Prices: type array [5,1], were we have stored the index of the selected margin for the day
-        i think that a random distribution for choosing which between the already generated margin to use is correct.
-"""
 
 def distribute_prices():
     return (npr.rand(numbers_of_products, 1) * different_value_of_prices).astype(int).reshape(numbers_of_products)
@@ -52,9 +53,10 @@ def distribute_prices():
 
 def distribute_alpha():
     # TODO add dependency with the users class.
-    product_weight = (npr.uniform(0.4, 1, numbers_of_products + 1))
-    product_weight[0] = 0.5  # [The competitor has higher weight ! ]
-    alpha_ratios = npr.dirichlet(product_weight, users_classes)
+    alpha_ratios = np.zeros((users_classes,numbers_of_products+1))
+    for i in classes.keys():
+        product_weight = classes[i]["alpha"]["alpha_weights"]
+        alpha_ratios[int(i)] = npr.dirichlet(product_weight, 1).reshape(numbers_of_products+1)
     # 6 ratios, the first is for the COMPETITOR webpage
     """
     distribution option:  -   dirichlet (forced)
@@ -64,13 +66,11 @@ def distribute_alpha():
 
 def distribute_total_user():
     total_users = np.zeros(users_classes)
-    max_users_per_class = data["users"]["distributions"]["max_users_per_class"]
-    # Standard deviation of the user's distribution between classes
-    user_per_class_std = data["users"]["distributions"]["user_per_class_std"]
 
-    for i in range(users_classes):
-        # TODO not sure??
-        total_users[i] = (npr.normal(max_users_per_class,
+    for i in classes.keys():
+        mean_users_per_class = classes[i]["total_user"]["mean_users_per_class"]
+        user_per_class_std = classes[i]["total_user"]["user_per_class_std"]
+        total_users[int(i)] = (npr.normal(mean_users_per_class,
                                      user_per_class_std, 1)).astype(int)
 
     # ::int array randomly from 0 to max_users_per_class
@@ -88,13 +88,11 @@ def user_distribution():
 
     #                                           1 Create the demand curves (conversion rates)
     conv_rates = np.zeros((users_classes, numbers_of_products))
-    max_demand = np.zeros(users_classes)
-    min_conv_rates = data["users"]["distributions"]["min_conv_rates"]
-
-    for i in range(users_classes):
+    for i in classes.keys():
+        min_demand = classes[i]["demand"]["min_demand"]
+        max_demand = classes[i]["demand"]["max_demand"]
         # Define a maximum value of conversion rates for every user class
-        max_demand[i] = npr.random()
-        conv_rates[i] = npr.uniform(min_conv_rates, max_demand[i], numbers_of_products)
+        conv_rates[int(i)] = npr.uniform(min_demand, max_demand, numbers_of_products)
 
     """
         Conversion rates are chosen uniform between 0 and a max[i]
@@ -108,8 +106,10 @@ def user_distribution():
     alpha_ratios = distribute_alpha()
 
     #                                           4 Create number of products sold
-    max_item_bought = data["users"]["distributions"]["max_item_bought"]
-    n_items_bought = npr.random((users_classes, different_value_of_prices, numbers_of_products)) * max_item_bought
+    n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
+    for i in classes.keys():
+        max_item_bought = classes[i]["n_items_buyed"]["max_item_bought"]
+        n_items_bought[int(i)] = npr.random((different_value_of_prices, numbers_of_products)) * max_item_bought
 
     # n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
     # n_items_bought_std = data["users"]["distributions"]["n_items_bought_std"]
@@ -128,12 +128,13 @@ def user_distribution():
     # FULLY CONNECTED
     graph_weights = np.zeros((users_classes, numbers_of_products, numbers_of_products))
     max_demand = np.zeros(users_classes)
-    min_graph_probability = data["users"]["distributions"]["min_graph_probability"]
 
-    for i in range(users_classes):
+    for i in classes.keys():
+        min_graph_probability = classes[i]["graph"]["min_probability"]
+        max_graph_probability = classes[i]["graph"]["max_probability"]
         # Define a maximum value of graph_weight for every user class
-        max_demand[i] = npr.uniform(min_graph_probability, 1)
-        graph_weights[i] = npr.uniform(0, max_demand[i], (numbers_of_products, numbers_of_products))
+        max_demand[int(i)] = npr.uniform(min_graph_probability, max_graph_probability)
+        graph_weights[int(i)] = npr.uniform(0, max_demand[int(i)], (numbers_of_products, numbers_of_products))
 
     # second type of graph set to 0 only certain values
     # NOT FULLY CONNECTED

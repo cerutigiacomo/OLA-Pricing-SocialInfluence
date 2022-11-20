@@ -1,26 +1,86 @@
 {
   "simulator": {
+    "days": 30,
+    "max_item_bought": 50
+  },
+  "product": {
     "max_margin": 1,
     "different_value_of_prices": 4,
     "numbers_of_products": 5,
-    "days": 30,
     "lambda": 0.2
   },
   "users": {
-    "features": [
-      "Studente",
-      "Operaio",
-      "Professore"
-    ],
-    "distributions": {
-      "max_item_bought": 5,
-      "max_users_per_class": 30,
-      "user_per_class_std": 10,
-      "min_conv_rates": 0.3,
-      "min_graph_probability": 0.4,
-      "n_items_bought_std": 2
+    "classes": {
+      "0": {
+        "name": "Student",
+        "alpha": {
+          "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
+          "min_alpha": 0.3,
+          "max_alpha": 0.8
+        },
+        "total_user": {
+          "mean_users_per_class": 30,
+          "user_per_class_std": 10
+        },
+        "demand": {
+          "min_demand": 0.3,
+          "max_demand": 1
+        },
+        "n_items_buyed": {
+          "max_item_bought": 30
+        },
+        "graph": {
+          "min_probability": 0.4,
+          "max_probability": 0.4
+        }
+      },
+      "1": {
+        "name": "Worker",
+        "alpha": {
+          "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
+          "min_alpha": 0.3,
+          "max_alpha": 0.8
+        },
+        "total_user": {
+          "mean_users_per_class": 30,
+          "user_per_class_std": 10
+        },
+        "demand": {
+          "min_demand": 0.3,
+          "max_demand": 1
+        },
+        "n_items_buyed": {
+          "max_item_bought": 30
+        },
+        "graph": {
+          "min_probability": 0.4,
+          "max_probability": 0.4
+        }
+      },
+      "2": {
+        "name": "Professor",
+        "alpha": {
+          "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
+          "min_alpha": 0.3,
+          "max_alpha": 0.8
+        },
+        "total_user": {
+          "mean_users_per_class": 30,
+          "user_per_class_std": 10
+        },
+        "demand": {
+          "min_demand": 0.3,
+          "max_demand": 1
+        },
+        "n_items_buyed": {
+          "max_item_bought": 30
+        },
+        "graph": {
+          "min_probability": 0.4,
+          "max_probability": 0.4
+        }
+      }
     },
     "graph_weight_fully_connected": 0
-
   }
 }

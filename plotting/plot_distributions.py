@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 f = open('../resources/environment.json')
 data = json.load(f)
 
-different_value_of_prices = data["simulator"]["different_value_of_prices"]
-numbers_of_products = data["simulator"]["numbers_of_products"]
-users_classes = len(data["users"]["features"])
+different_value_of_prices = data["product"]["different_value_of_prices"]
+numbers_of_products = data["product"]["numbers_of_products"]
+users_classes = len(data["users"]["classes"])
 colors = ["r", "g", "b"]
 
 

@@ -24,6 +24,10 @@ class Simulator:
         rewards = np.zeros(5, np.float16)
         # Conversion rates gives an hypothetical maximum price for that product
         conversion_factor = user_class.conv_rates[j] > npr.random()
+        # "she/he buys a number of units of the primary product
+        # if the price of a single unit is under the user’ reservation price"
+        current_margin = self.margins[self.prices[j]][j]
+        conversion_factor = user_class.conv_rates[j] > current_margin
 
         rewards[j] = self.margins[self.prices[j]][j] * \
                      user_class.n_items_bought[self.prices[j]][j] * \

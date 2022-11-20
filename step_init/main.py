@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 debug_print_distribution = True
 f = open('../resources/environment.json')
 data = json.load(f)
-max_item_bought = data["users"]["distributions"]["max_item_bought"]
+max_item_bought = data["simulator"]["max_item_bought"]
 
 def simple_run():
     reward = np.zeros(numbers_of_products)
@@ -53,7 +53,7 @@ def simulate_multiple_days(days):
 
 # DEFINE THE SIMULATOR
 prices, margins, secondary = simulator_distribution()
-lamb = data["simulator"]["lambda"]  # LAMBDA
+lamb = data["product"]["lambda"]  # LAMBDA
 sim = Simulator(prices, margins, lamb, secondary)
 
 # DEFINE 3 CLASS OF USERS
