@@ -2,7 +2,7 @@ from simulator import *
 from users import *
 from website_simulation import website_simulation
 from plotting.plot_distributions import *
-from define_distribution import *
+from resources.define_distribution import *
 import json
 import matplotlib.pyplot as plt
 
@@ -57,9 +57,6 @@ lamb = data["product"]["lambda"]  # LAMBDA
 sim = Simulator(prices, margins, lamb, secondary)
 
 # DEFINE 3 CLASS OF USERS
-# [assume that there are 2 binary features that define 3 different user classes.]
-# ???? [WHICH ARE THE TWO BINARY FEATURE THAT DEFINE 3 CLASS OF USERS] ?????
-# 00 01 10 11 are 4...
 total_users, alpha_ratios, graph, n_items_bought, conv_rates = user_distribution()
 
 users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i])

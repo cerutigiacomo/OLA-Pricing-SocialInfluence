@@ -1,18 +1,21 @@
 {
   "simulator": {
-    "days": 30,
+    "days": 10,
     "max_item_bought": 15,
     "max_users": 300
   },
   "product": {
+    "price": {
+    },
+
     "max_margin": 1,
     "different_value_of_prices": 4,
     "numbers_of_products": 5,
     "lambda": 0.2
   },
   "users": {
-    "classes": {
-      "0": {
+    "classes": [
+      {
         "name": "Student",
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
@@ -25,7 +28,7 @@
         },
         "demand": {
           "min_demand": 0.4,
-          "max_demand": 1
+          "max_demand": 0.7
         },
         "n_items_buyed": {
           "max_item_bought": 5
@@ -35,7 +38,7 @@
           "max_probability": 1
         }
       },
-      "1": {
+      {
         "name": "Worker",
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
@@ -47,7 +50,7 @@
           "user_per_class_std": 10
         },
         "demand": {
-          "min_demand": 0.8,
+          "min_demand": 0.5,
           "max_demand": 1
         },
         "n_items_buyed": {
@@ -58,7 +61,7 @@
           "max_probability": 0.8
         }
       },
-      "2": {
+      {
         "name": "Professor",
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
@@ -81,7 +84,7 @@
           "max_probability": 0.9
         }
       }
-    },
+    ],
     "graph_weight_fully_connected": 0
   }
 }

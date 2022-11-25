@@ -13,8 +13,12 @@ users_classes = len(classes)
 
 
 def simulator_distribution():
+    # For every product, order the prices in increasing levels. Every price is associated with a known margin.
+    # TODO, margin and prices are different values!!
     margins = npr.random((different_value_of_prices, numbers_of_products)) * max_margin
     prices = distribute_prices()
+
+
 
     # Define the pair and the order of the secondary products to display
     secondary = np.zeros((numbers_of_products, 2))
@@ -54,9 +58,9 @@ def distribute_prices():
 def distribute_alpha():
     # TODO add dependency with the users class.
     alpha_ratios = np.zeros((users_classes,numbers_of_products+1))
-    for i in classes.keys():
+    for i in range(users_classes):
         product_weight = classes[i]["alpha"]["alpha_weights"]
-        alpha_ratios[int(i)] = npr.dirichlet(product_weight, 1).reshape(numbers_of_products+1)
+        alpha_ratios[i] = npr.dirichlet(product_weight, 1).reshape(numbers_of_products+1)
     # 6 ratios, the first is for the COMPETITOR webpage
     """
     distribution option:  -   dirichlet (forced)
@@ -67,10 +71,10 @@ def distribute_alpha():
 def distribute_total_user():
     total_users = np.zeros(users_classes)
 
-    for i in classes.keys():
+    for i in range(users_classes):
         mean_users_per_class = classes[i]["total_user"]["mean_users_per_class"]
         user_per_class_std = classes[i]["total_user"]["user_per_class_std"]
-        total_users[int(i)] = (npr.normal(mean_users_per_class,
+        total_users[i] = (npr.normal(mean_users_per_class,
                                      user_per_class_std, 1)).astype(int)
 
     # ::int array randomly from 0 to max_users_per_class
@@ -88,11 +92,11 @@ def user_distribution():
 
     #                                           1 Create the demand curves (conversion rates)
     conv_rates = np.zeros((users_classes, numbers_of_products))
-    for i in classes.keys():
+    for i in range(users_classes):
         min_demand = classes[i]["demand"]["min_demand"]
         max_demand = classes[i]["demand"]["max_demand"]
         # Define a maximum value of conversion rates for every user class
-        conv_rates[int(i)] = npr.uniform(min_demand, max_demand, numbers_of_products)
+        conv_rates[i] = npr.uniform(min_demand, max_demand, numbers_of_products)
 
     """
         Conversion rates are chosen uniform between 0 and a max[i]
@@ -107,9 +111,9 @@ def user_distribution():
 
     #                                           4 Create number of products sold
     n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
-    for i in classes.keys():
+    for i in range(users_classes):
         max_item_bought = classes[i]["n_items_buyed"]["max_item_bought"]
-        n_items_bought[int(i)] = npr.uniform(0, max_item_bought, (different_value_of_prices, numbers_of_products)).astype(int)
+        n_items_bought[i] = npr.uniform(0, max_item_bought, (different_value_of_prices, numbers_of_products)).astype(int)
 
     # n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
     # n_items_bought_std = data["users"]["distributions"]["n_items_bought_std"]
@@ -129,12 +133,12 @@ def user_distribution():
     graph_weights = np.zeros((users_classes, numbers_of_products, numbers_of_products))
     max_demand = np.zeros(users_classes)
 
-    for i in classes.keys():
+    for i in range(users_classes):
         min_graph_probability = classes[i]["graph"]["min_probability"]
         max_graph_probability = classes[i]["graph"]["max_probability"]
         # Define a maximum value of graph_weight for every user class
-        max_demand[int(i)] = npr.uniform(min_graph_probability, max_graph_probability)
-        graph_weights[int(i)] = npr.uniform(0, max_demand[int(i)], (numbers_of_products, numbers_of_products))
+        max_demand[i] = npr.uniform(min_graph_probability, max_graph_probability)
+        graph_weights[i] = npr.uniform(0, max_demand[i], (numbers_of_products, numbers_of_products))
 
     # second type of graph set to 0 only certain values
     # NOT FULLY CONNECTED

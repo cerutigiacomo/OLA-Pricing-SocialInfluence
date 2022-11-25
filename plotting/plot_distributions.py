@@ -8,7 +8,7 @@ different_value_of_prices = data["product"]["different_value_of_prices"]
 numbers_of_products = data["product"]["numbers_of_products"]
 users_classes = len(data["users"]["classes"])
 colors = ["r", "g", "b"]
-
+classes = data["users"]["classes"]
 
 def plot_simulator(margins, prices, secondary):
     fig, axs = plt.subplots(ncols=2)
@@ -37,7 +37,7 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_ite
 
     for i in range(users_classes):
         axs[0, 1].plot(list(range(1 + numbers_of_products)), alpha_ratios[i], colors[i] + 'o', mfc='none',
-                       label='class' + str(i))
+                       label='class' + classes[i]["name"])
     axs[0, 1].set_xticks(list(range(1 + numbers_of_products)), list(range(1 + numbers_of_products)))
     axs[0, 1].set_title("Alpha Ratios")
     axs[0, 1].grid()
@@ -46,25 +46,25 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_ite
     for i in range(users_classes):
         axs[1, i].plot(graph[i], colors[i] + 'o', mfc='none', label='class' + str(i))
         axs[1, i].set_xticks(list(range(numbers_of_products)), list(range(numbers_of_products)))
-        axs[1, i].set_title("Graph w. " + str(i))
+        axs[1, i].set_title("Graph w. " + classes[i]["name"])
         axs[1, i].grid()
         axs[1, i].set_ylim([0, 1])
 
     for i in range(users_classes):
         items = [n_items_bought[i].transpose()[j][prices[j]] for j in range(numbers_of_products)]
         axs[2, i].plot(items, colors[i] + 'o-', mfc='none',
-                       label='class' + str(i))
+                       label='class' + classes[i]["name"])
 
         axs[2, i].set_xticks(list(range(numbers_of_products)), list(range(numbers_of_products)))
         axs[2, i].set_yticks(list(range(1 + max_item_bought * 2)), list(range(1 + max_item_bought * 2)))
-        axs[2, i].set_title("N items bought " + str(i))
+        axs[2, i].set_title("N items bought " + classes[i]["name"])
         axs[2, i].grid()
         axs[2, i].set_ylim([0, max_item_bought])
 
     for i in range(users_classes):
         axs[i, 3].plot(conv_rates[i], colors[i] + 'o-', mfc='none', label='class' + str(i))
         axs[i, 3].set_xticks(list(range(numbers_of_products)), list(range(numbers_of_products)))
-        axs[i, 3].set_title("Conv. Rates " + str(i))
+        axs[i, 3].set_title("Conv. Rates " + classes[i]["name"])
         axs[i, 3].grid()
         axs[i, 3].set_ylim([0, 1])
 
