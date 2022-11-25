@@ -14,11 +14,9 @@ users_classes = len(classes)
 
 def simulator_distribution():
     # For every product, order the prices in increasing levels. Every price is associated with a known margin.
-    # TODO, margin and prices are different values!!
-    margins = npr.random((different_value_of_prices, numbers_of_products)) * max_margin
-    prices = distribute_prices()
+    prices, margins = distribute_prices()
 
-
+    conv_factor = npr.random((numbers_of_products ,different_value_of_prices))
 
     # Define the pair and the order of the secondary products to display
     secondary = np.zeros((numbers_of_products, 2))
@@ -52,7 +50,12 @@ def simulator_distribution():
     return prices, margins, secondary
 
 def distribute_prices():
-    return (npr.rand(numbers_of_products, 1) * different_value_of_prices).astype(int).reshape(numbers_of_products)
+    today = int(npr.choice(different_value_of_prices))
+    products = data["product"]["products"]
+
+    prices = [products[i]["price"][today] for i in range(numbers_of_products)]
+    margin = [products[i]["price"][today]-products[i]["cost"] for i in range(numbers_of_products)]
+    return prices, margin
 
 
 def distribute_alpha():
@@ -110,18 +113,11 @@ def user_distribution():
     alpha_ratios = distribute_alpha()
 
     #                                           4 Create number of products sold
-    n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
+    # Uncorrelated with the actual price ??
+    n_items_bought = np.zeros((users_classes, numbers_of_products))
     for i in range(users_classes):
         max_item_bought = classes[i]["n_items_buyed"]["max_item_bought"]
-        n_items_bought[i] = npr.uniform(0, max_item_bought, (different_value_of_prices, numbers_of_products)).astype(int)
-
-    # n_items_bought = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
-    # n_items_bought_std = data["users"]["distributions"]["n_items_bought_std"]
-    #  Standard deviation of the user's distribution between classes
-    # for i in range(users_classes):
-    #     n_items_bought[i] = (npr.normal(max_item_bought,
-    #                                     n_items_bought_std,
-    #                                     (different_value_of_prices, numbers_of_products))).astype(int)
+        n_items_bought[i] = npr.uniform(0, max_item_bought, numbers_of_products).astype(int)
 
     """
     From the text: 

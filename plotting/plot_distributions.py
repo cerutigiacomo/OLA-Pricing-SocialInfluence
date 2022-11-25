@@ -12,10 +12,9 @@ classes = data["users"]["classes"]
 
 def plot_simulator(margins, prices, secondary):
     fig, axs = plt.subplots(ncols=2)
-    axs[0].plot(list(range(numbers_of_products)), margins.transpose(), 'bo', mfc='none')
-    for i in range(numbers_of_products):
-        axs[0].plot(i, margins.transpose()[i][prices[i]], 'rx')
-    axs[0].set_title("Price of the product selected")
+    axs[0].plot(list(range(numbers_of_products)), margins, 'o', label="margins")
+    axs[0].plot(list(range(numbers_of_products)), prices, 'x', label='prices')
+    axs[0].set_title("Price and margin of the product selected")
     axs[0].grid()
     axs[1].plot(list(range(numbers_of_products)), secondary, 'bo', mfc='none')
     axs[1].set_title("Secondary association")
@@ -51,8 +50,7 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, prices, max_ite
         axs[1, i].set_ylim([0, 1])
 
     for i in range(users_classes):
-        items = [n_items_bought[i].transpose()[j][prices[j]] for j in range(numbers_of_products)]
-        axs[2, i].plot(items, colors[i] + 'o-', mfc='none',
+        axs[2, i].plot(n_items_bought, colors[i] + 'o-', mfc='none',
                        label='class' + classes[i]["name"])
 
         axs[2, i].set_xticks(list(range(numbers_of_products)), list(range(numbers_of_products)))

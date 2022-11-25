@@ -6,7 +6,7 @@ from resources.define_distribution import *
 import json
 import matplotlib.pyplot as plt
 
-debug_print_distribution = True
+debug_print_distribution = False
 f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]

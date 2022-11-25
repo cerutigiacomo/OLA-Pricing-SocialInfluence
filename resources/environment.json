@@ -5,8 +5,33 @@
     "max_users": 300
   },
   "product": {
-    "price": {
-    },
+    "products": [
+      {
+        "name": "DVD",
+        "cost": 9,
+        "price": [15,17,20,25]
+      },
+      {
+        "name": "Statue",
+        "cost": 18,
+        "price": [21,23,25,30]
+      },
+      {
+        "name": "Keyholder",
+        "cost": 3,
+        "price": [4,5,7,8]
+      },
+      {
+        "name": "Cup",
+        "cost": 5,
+        "price": [8,10,12,15]
+      },
+      {
+        "name": "Poster",
+        "cost": 4,
+        "price": [10,13,15,16]
+      }
+    ],
 
     "max_margin": 1,
     "different_value_of_prices": 4,

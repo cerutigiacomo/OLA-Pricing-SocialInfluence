@@ -19,11 +19,7 @@ def website_simulation(sim, user_class):
 
 def run_for_total_user(user_class, sim, total_rewards):
     for i in range(user_class.total_users - 1):
-        # Reward of the single product
-        # product_reward = np.zeros(5, np.float16)
-        # for n in range(round(user_class.total_users)):
         sim.visited_primaries = []
-        # TODO select the correct product by using alpha probabilities
         j = int(np.random.choice(numbers_of_products+1, 1, p=user_class.alpha))
         if j == 0:
             # The competitor has been selected!
@@ -32,8 +28,6 @@ def run_for_total_user(user_class, sim, total_rewards):
         rewards = sim.simulation(j, user_class)
         total_rewards += rewards
 
-        # total_rewards += product_reward
-        # print(round(user_class.total_users[j+1]),"users landing on product", j+1 ,product_reward)
         return total_rewards
 
 """ From the text
