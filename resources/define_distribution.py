@@ -14,9 +14,7 @@ users_classes = len(classes)
 
 def simulator_distribution():
     # For every product, order the prices in increasing levels. Every price is associated with a known margin.
-    prices, margins = distribute_prices()
-
-    conv_factor = npr.random((numbers_of_products ,different_value_of_prices))
+    prices, margins, today = distribute_prices()
 
     # Define the pair and the order of the secondary products to display
     secondary = np.zeros((numbers_of_products, 2))
@@ -47,7 +45,7 @@ def simulator_distribution():
         Prices: type array [5,1], were we have stored the index of the selected margin for the day
             i think that a random distribution for choosing which between the already generated margin to use is correct.
     """
-    return prices, margins, secondary
+    return prices, margins, secondary, today
 
 def distribute_prices():
     today = int(npr.choice(different_value_of_prices))
@@ -55,11 +53,10 @@ def distribute_prices():
 
     prices = [products[i]["price"][today] for i in range(numbers_of_products)]
     margin = [products[i]["price"][today]-products[i]["cost"] for i in range(numbers_of_products)]
-    return prices, margin
+    return prices, margin, today
 
 
 def distribute_alpha():
-    # TODO add dependency with the users class.
     alpha_ratios = np.zeros((users_classes,numbers_of_products+1))
     for i in range(users_classes):
         product_weight = classes[i]["alpha"]["alpha_weights"]
@@ -94,12 +91,13 @@ def distribute_total_user():
 def user_distribution():
 
     #                                           1 Create the demand curves (conversion rates)
-    conv_rates = np.zeros((users_classes, numbers_of_products))
+    conv_rates = np.zeros((users_classes, different_value_of_prices, numbers_of_products))
+    # TODO generate conv factor for every prices of every product
     for i in range(users_classes):
         min_demand = classes[i]["demand"]["min_demand"]
         max_demand = classes[i]["demand"]["max_demand"]
         # Define a maximum value of conversion rates for every user class
-        conv_rates[i] = npr.uniform(min_demand, max_demand, numbers_of_products)
+        conv_rates[i] = npr.uniform(min_demand, max_demand, (different_value_of_prices, numbers_of_products))
 
     """
         Conversion rates are chosen uniform between 0 and a max[i]

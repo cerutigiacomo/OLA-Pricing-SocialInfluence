@@ -4,7 +4,6 @@ from website_simulation import website_simulation
 from plotting.plot_distributions import *
 from resources.define_distribution import *
 import json
-import matplotlib.pyplot as plt
 
 debug_print_distribution = False
 f = open('../resources/environment.json')
@@ -22,7 +21,6 @@ def simple_run():
 
 
 def simulate_multiple_days(days):
-    plt.rcParams["figure.figsize"] = (15,10)
     total_reward = np.zeros(numbers_of_products)
     for j in range(days):
         reward = np.zeros(numbers_of_products)
@@ -30,7 +28,6 @@ def simulate_multiple_days(days):
             reward += website_simulation(sim, users[i])
         np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
         print("total revenue ", reward)
-        plt.plot(list(range(numbers_of_products)), reward, 'o-', mfc='none')
         total_reward += reward
         # Change the prices, alpha, total_users daily
         new_alpha = distribute_alpha()
@@ -38,23 +35,15 @@ def simulate_multiple_days(days):
         for i in range(users_classes):
             users[i].alpha = new_alpha[i]
             users[i].total_users = new_total_users[i]
-        sim.prices = distribute_prices()
-
-
-    plt.xlabel('Product')
-    plt.ylabel('Reward')
-    plt.xticks(list(range(numbers_of_products)), list(range(numbers_of_products)))
-    plt.grid()
-    plt.suptitle('Reward for single day')
-    plt.show()
+        sim.prices, sim.margins, sim.today = distribute_prices()
 
     plot_reward(total_reward)
 
 
 # DEFINE THE SIMULATOR
-prices, margins, secondary = simulator_distribution()
+prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
-sim = Simulator(prices, margins, lamb, secondary)
+sim = Simulator(prices, margins, lamb, secondary, today)
 
 # DEFINE 3 CLASS OF USERS
 total_users, alpha_ratios, graph, n_items_bought, conv_rates = user_distribution()

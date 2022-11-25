@@ -5,7 +5,7 @@ from scipy.stats import bernoulli
 
 
 class Simulator:
-    def __init__(self, prices, margins, lamb, secondary) -> None:
+    def __init__(self, prices, margins, lamb, secondary, today) -> None:
         # self.prices are the price levels set for each product
         self.prices = prices
         # margins matrix associated for each product and each price point
@@ -13,6 +13,7 @@ class Simulator:
         self.lamb = lamb
         self.visited_primaries = []
         self.secondary_product = secondary
+        self.today = today
 
     def simulation(self, j, user_class):
         # This recursive method simulates one user landing on a webpage of one product.
@@ -29,7 +30,7 @@ class Simulator:
 
         # TODO REVIEW!
         # bernullli launch with probability of the user class conversion rate
-        conversion_factor = bernoulli.rvs(user_class.conv_rates[j], 1)
+        conversion_factor = bernoulli.rvs(user_class.conv_rates[self.today][j], 1)
         rewards[j] = self.margins[j] * \
                      user_class.n_items_bought[j] * \
                      conversion_factor
