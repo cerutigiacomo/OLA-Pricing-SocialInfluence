@@ -5,7 +5,7 @@ from scipy.stats import bernoulli
 
 
 class Simulator:
-    def __init__(self, prices, margins, lamb, secondary, today) -> None:
+    def __init__(self, prices, margins, lamb, secondary, prices_index) -> None:
         # self.prices are the price levels set for each product
         self.prices = prices
         # margins matrix associated for each product and each price point
@@ -13,7 +13,11 @@ class Simulator:
         self.lamb = lamb
         self.visited_primaries = []
         self.secondary_product = secondary
-        self.today = today
+        self.prices_index = prices_index
+
+
+    def reset(self):
+        self.visited_primaries = []
 
     def simulation(self, j, user_class):
         # This recursive method simulates one user landing on a webpage of one product.
@@ -30,7 +34,7 @@ class Simulator:
 
         # TODO REVIEW!
         # bernullli launch with probability of the user class conversion rate
-        conversion_factor = bernoulli.rvs(user_class.conv_rates[self.today][j], 1)
+        conversion_factor = bernoulli.rvs(user_class.conv_rates[j][self.prices_index[j]], size=1)
         rewards[j] = self.margins[j] * \
                      user_class.n_items_bought[j] * \
                      conversion_factor
@@ -38,16 +42,17 @@ class Simulator:
         # Add the current product to the visited ones.
         self.visited_primaries.append(j)
 
-        arr = deepcopy(user_class.graph_weights)[j]   # deepcopy copy all sub-element and not just the pointer
+        arr = deepcopy(user_class.graph_weights)[j]  # deepcopy copy all sub-element and not just the pointer
         arr[self.visited_primaries] = 0.0
 
         if not conversion_factor:
             # Return if the user do not but any item of this product
-            return 0
+            return [0 for _ in range(5)]
+        # print("bought: ", user_class.n_items_bought[j], " items of product: ", j)
 
         # FIRST SECONDARY
         first_secondary = int(self.secondary_product[j][0])  # Observation vector for every product!
-        if arr[first_secondary] > npr.random():
+        if bernoulli.rvs(arr[first_secondary], size=1):
             # print("going to first secondary",first_secondary,"from prim",j)
             rewards += self.simulation(first_secondary, user_class)
 
@@ -55,9 +60,8 @@ class Simulator:
 
         # SECOND SECONDARY
         second_secondary = int(self.secondary_product[j][1])
-        if (arr[second_secondary] * self.lamb) > npr.random():
+        if bernoulli.rvs(arr[second_secondary]*self.lamb, size=1):
             # print("going to second secondary",second_secondary,"from prim",j)
             rewards += self.simulation(second_secondary, user_class)
-
         # Returns the rewards of that user associated to products bought
         return rewards

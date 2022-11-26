@@ -1,6 +1,6 @@
 from simulator import *
 from users import *
-from website_simulation import website_simulation
+from website_simulation import *
 from plotting.plot_distributions import *
 from resources.define_distribution import *
 import json
@@ -11,39 +11,18 @@ data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 
 def simple_run():
-    reward = np.zeros(numbers_of_products)
-    for i in range(users_classes):
-        reward += website_simulation(sim, users[i])
+    reward = website_simulation(sim, users)
     np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
     print("total revenue ", reward)
 
     plot_reward(reward)
 
 
-def simulate_multiple_days(days):
-    total_reward = np.zeros(numbers_of_products)
-    for j in range(days):
-        reward = np.zeros(numbers_of_products)
-        for i in range(users_classes):
-            reward += website_simulation(sim, users[i])
-        np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
-        print("total revenue ", reward)
-        total_reward += reward
-        # Change the prices, alpha, total_users daily
-        new_alpha = distribute_alpha()
-        new_total_users = distribute_total_user()
-        for i in range(users_classes):
-            users[i].alpha = new_alpha[i]
-            users[i].total_users = new_total_users[i]
-        sim.prices, sim.margins, sim.today = distribute_prices()
-
-    plot_reward(total_reward)
-
 
 # DEFINE THE SIMULATOR
 prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
-sim = Simulator(prices, margins, lamb, secondary, today)
+sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 
 # DEFINE 3 CLASS OF USERS
 total_users, alpha_ratios, graph, n_items_bought, conv_rates = user_distribution()
@@ -58,4 +37,4 @@ if debug_print_distribution:
 
 # RUN the simulation
 days = data["simulator"]["days"]
-simulate_multiple_days(days)
+simulate_multiple_days(sim, users)
