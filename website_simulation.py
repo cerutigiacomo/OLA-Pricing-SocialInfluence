@@ -1,4 +1,3 @@
-import numpy as np
 import numpy.random as npr
 from resources.define_distribution import *
 from plotting.plot_distributions import *
@@ -8,6 +7,7 @@ f = open('../resources/environment.json')
 data = json.load(f)
 numbers_of_products = data["product"]["numbers_of_products"]
 days_simulation = data["simulator"]["days"]
+
 
 def website_simulation(sim, users):
     # This method simulates users visiting the ecommerce website
@@ -76,5 +76,3 @@ def run_for_alpha_ratio(user_class, sim):
 
     # plot_result_simulation(rewards_count, visited)
     return total_rewards
-
-

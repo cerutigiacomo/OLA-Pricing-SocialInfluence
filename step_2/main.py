@@ -1,6 +1,5 @@
 from users import *
 from greedyReward import *
-from website_simulation import website_simulation
 from plotting.plot_distributions import *
 from resources.define_distribution import *
 import json
@@ -26,7 +25,7 @@ sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 classes_idx = [0]
 total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
 
-users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i],features[i])
+users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], features[i])
          for i in range(len(classes_idx))]
 
 # Plot distributions

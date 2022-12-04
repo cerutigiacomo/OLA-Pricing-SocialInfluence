@@ -7,7 +7,6 @@ data = json.load(f)
 different_value_of_prices = data["product"]["different_value_of_prices"]
 numbers_of_products = data["product"]["numbers_of_products"]
 classes = data["users"]["classes"]
-features = data["users"]["features"]
 users_classes = len(classes)
 npr.seed(data["simulator"]["seed"])
 
@@ -17,17 +16,7 @@ def simulator_distribution():
     prices, margins, today = distribute_prices()
 
     # Define the pair and the order of the secondary products to display
-    secondary = np.zeros((numbers_of_products, 2))
-    all_contained = False
-    # Every product should have different secondary product (different from himself)
-    # Every product has to be reachable, so all the product has to be contained in the secondary array [????]
-    while not all_contained:
-        for i in range(numbers_of_products):
-            secondary[i] = npr.choice(numbers_of_products, 2, replace=False)
-            while np.isin(secondary[i], i).any():
-                secondary[i] = npr.choice(numbers_of_products, 2, replace=False)
-        values = np.isin(secondary, list(range(numbers_of_products)))
-        all_contained = values.all()
+    secondary = data["simulator"]["secondary"]
 
     return prices, margins, secondary, today
 
@@ -81,20 +70,20 @@ def distribute_total_user(classes_idx):
 
 
 def user_distribution(classes_idx=None):
-    #                                           1 Create the demand curves (conversion rates)
     if classes_idx is None:
         classes_idx = [0]
 
+    features = []
+    for i in range(len(classes_idx)):
+        features.append(classes[classes_idx[i]]["features"])
 
+    #                                           1 Create the demand curves (conversion rates)
     conv_rates = np.zeros((len(classes_idx), numbers_of_products, different_value_of_prices))
     for i in range(len(classes_idx)):
         min_demand = classes[classes_idx[i]]["demand"]["min_demand"]
         max_demand = classes[classes_idx[i]]["demand"]["max_demand"]
         # Define a maximum value of conversion rates for every user class
         conv_rates[i] = npr.uniform(min_demand, max_demand, (numbers_of_products, different_value_of_prices))
-    features= []
-    for i in range(len(classes_idx)):
-        features.append(classes[classes_idx[i]]["features"])
 
     """
         Conversion rates are chosen uniform between 0 and a max[i]

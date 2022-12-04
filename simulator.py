@@ -15,7 +15,6 @@ class Simulator:
         self.secondary_product = secondary
         self.prices_index = prices_index
 
-
     def reset(self):
         self.visited_primaries = []
 
@@ -33,7 +32,7 @@ class Simulator:
         # if the price of a single unit is under the user’ reservation price"
 
         # TODO REVIEW!
-        # bernullli launch with probability of the user class conversion rate
+        # bernoullli launch with probability of the user class conversion rate
         conversion_factor = bernoulli.rvs(user_class.conv_rates[j][self.prices_index[j]], size=1)
         rewards[j] = self.margins[j] * \
                      user_class.n_items_bought[j] * \

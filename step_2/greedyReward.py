@@ -5,6 +5,7 @@ from resources.define_distribution import *
 
 debug = False
 
+
 class GreedyReward:
     def __init__(self, lamb, secondary, users) -> None:
         self.lamb = lamb
@@ -24,7 +25,7 @@ class GreedyReward:
 
     # There is no guarantee that the algorithm will return the optimal price configuration.
     def bestReward(self):
-        self.ite+=1
+        self.ite += 1
         rewards = [[] for _ in range(5)]
         # Product to optimize
         j = -1
@@ -67,7 +68,8 @@ class GreedyReward:
         # with the lowest price for all the products
         return self.reward
 
-    def get_prices(self, index):
+    @staticmethod
+    def get_prices(index):
         products = get_product()
         prices = [products[i]["price"][index[i]] for i in range(numbers_of_products)]
         margin = [products[i]["price"][index[i]] - products[i]["cost"] for i in range(numbers_of_products)]

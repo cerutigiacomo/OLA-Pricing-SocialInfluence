@@ -10,6 +10,7 @@ users_classes = len(data["users"]["classes"])
 colors = ["r", "g", "b", "y"]
 classes = data["users"]["classes"]
 
+
 def plot_simulator(margins, prices, secondary):
     fig, axs = plt.subplots(ncols=2)
     axs[0].plot(list(range(numbers_of_products)), margins, 'o', label="margins")
@@ -41,8 +42,6 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought
     axs[0, 1].set_title("Alpha Ratios")
     axs[0, 1].grid()
     axs[0, 1].set_ylim([0, 1])
-
-
 
     for i in range(len(classes_idx)):
         axs[0, 2].plot(n_items_bought[i], colors[i] + 'o-', mfc='none',
@@ -78,8 +77,9 @@ def plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought
     fig.tight_layout()
     plt.show()
 
+
 def plot_reward(reward):
-    plt.rcParams["figure.figsize"] = (15,10)
+    plt.rcParams["figure.figsize"] = (15, 10)
     plt.plot(list(range(numbers_of_products)), reward, 'o-', mfc='none')
     plt.xlabel('Product')
     plt.ylabel('Reward')
@@ -88,6 +88,7 @@ def plot_reward(reward):
     plt.suptitle('Rewards')
 
     plt.show()
+
 
 def plot_result_simulation(reward, visited):
     colors = ["r", "g", "b", "y", 'r']
