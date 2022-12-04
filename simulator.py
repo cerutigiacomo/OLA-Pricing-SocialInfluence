@@ -35,7 +35,7 @@ class Simulator:
         # bernoullli launch with probability of the user class conversion rate
         conversion_factor = bernoulli.rvs(user_class.conv_rates[j][self.prices_index[j]], size=1)
         rewards[j] = self.margins[j] * \
-                     user_class.n_items_bought[j] * \
+                     user_class.get_n_items_to_buy(j) * \
                      conversion_factor
 
         # Add the current product to the visited ones.

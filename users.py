@@ -1,3 +1,10 @@
+import numpy.random as npr
+import json
+
+f = open('../resources/environment.json')
+data = json.load(f)
+
+
 class Users_group:
     # This class defines a single group of users that is meant to visit the ecommerce website
     # Pass parameters that correspond to a specific class of users
@@ -14,3 +21,7 @@ class Users_group:
         self.n_items_bought = n_items_bought
         # the demand curves of the 5 products
         self.conv_rates = conv_rates
+
+    def get_n_items_to_buy(self, product):
+        npr.seed(data["simulator"]["seed"])
+        return int(npr.uniform(1, self.n_items_bought[product]))
