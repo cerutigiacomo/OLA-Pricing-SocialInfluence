@@ -38,9 +38,11 @@
     "lambda": 0.8
   },
   "users": {
+    "features": ["feature-1", "feature-2"],
     "classes": [
       {
         "name": "Student",
+        "features": [true, true],
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
           "min_alpha": 0.3,
@@ -64,6 +66,7 @@
       },
       {
         "name": "Worker",
+        "features": [false, false],
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
           "min_alpha": 0.3,
@@ -87,6 +90,7 @@
       },
       {
         "name": "Professor",
+        "features": [true, false],
         "alpha": {
           "alpha_weights": [0.4, 0.3, 0.3, 0.4, 0.6, 0.4],
           "min_alpha": 0.3,

@@ -19,7 +19,7 @@ def website_simulation(sim, users):
     return total_rewards
 
 
-def simulate_multiple_days(sim, users, days=days_simulation):
+def simulate_multiple_days(sim, users, classes_idx, days=days_simulation):
     total_reward = np.zeros(numbers_of_products)
     for j in range(days):
         reward = website_simulation(sim, users)
@@ -27,8 +27,8 @@ def simulate_multiple_days(sim, users, days=days_simulation):
         # print("total revenue ", reward)
         total_reward += reward
         # Change the prices, alpha, total_users daily
-        new_alpha = distribute_alpha()
-        new_total_users = distribute_total_user()
+        new_alpha = distribute_alpha(classes_idx)
+        new_total_users = distribute_total_user(classes_idx)
         for i in range(users_classes):
             users[i].alpha = new_alpha[i]
             users[i].total_users = new_total_users[i]

@@ -22,16 +22,17 @@ prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
 sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 
-# DEFINE 3 CLASS OF USERS
-total_users, alpha_ratios, graph, n_items_bought, conv_rates = user_distribution()
+# DEFINE 1 CLASS OF USERS, the 1st one
+classes_idx = [0]
+total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
 
-users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i])
-         for i in range(users_classes)]
+users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i],features[i])
+         for i in range(len(classes_idx))]
 
 # Plot distributions
 if debug_print_distribution:
     plot_simulator(margins, prices, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates)
+    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates, classes_idx)
 
 
 greedy = GreedyReward(lamb, secondary, users)

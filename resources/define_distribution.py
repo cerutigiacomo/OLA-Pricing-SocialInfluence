@@ -7,6 +7,7 @@ data = json.load(f)
 different_value_of_prices = data["product"]["different_value_of_prices"]
 numbers_of_products = data["product"]["numbers_of_products"]
 classes = data["users"]["classes"]
+features = data["users"]["features"]
 users_classes = len(classes)
 npr.seed(data["simulator"]["seed"])
 
@@ -28,7 +29,6 @@ def simulator_distribution():
         values = np.isin(secondary, list(range(numbers_of_products)))
         all_contained = values.all()
 
-    lamb = data["product"]["lambda"]  # LAMBDA
     return prices, margins, secondary, today
 
 
@@ -46,10 +46,10 @@ def get_product():
     return products
 
 
-def distribute_alpha():
-    alpha_ratios = np.zeros((users_classes, numbers_of_products + 1))
-    for i in range(users_classes):
-        product_weight = classes[i]["alpha"]["alpha_weights"]
+def distribute_alpha(classes_idx):
+    alpha_ratios = np.zeros((len(classes_idx), numbers_of_products + 1))
+    for i in range(len(classes_idx)):
+        product_weight = classes[classes_idx[i]]["alpha"]["alpha_weights"]
         alpha_ratios[i] = npr.dirichlet(product_weight, 1).reshape(numbers_of_products + 1)
     # 6 ratios, the first is for the COMPETITOR webpage
     """
@@ -59,12 +59,12 @@ def distribute_alpha():
     return alpha_ratios
 
 
-def distribute_total_user():
-    total_users = np.zeros(users_classes)
+def distribute_total_user(classes_idx):
+    total_users = np.zeros(len(classes_idx))
 
-    for i in range(users_classes):
-        mean_users_per_class = classes[i]["total_user"]["mean_users_per_class"]
-        user_per_class_std = classes[i]["total_user"]["user_per_class_std"]
+    for i in range(len(classes_idx)):
+        mean_users_per_class = classes[classes_idx[i]]["total_user"]["mean_users_per_class"]
+        user_per_class_std = classes[classes_idx[i]]["total_user"]["user_per_class_std"]
         total_users[i] = (npr.normal(mean_users_per_class,
                                      user_per_class_std, 1)).astype(int)
 
@@ -80,14 +80,21 @@ def distribute_total_user():
     return total_users
 
 
-def user_distribution():
+def user_distribution(classes_idx=None):
     #                                           1 Create the demand curves (conversion rates)
-    conv_rates = np.zeros((users_classes, numbers_of_products, different_value_of_prices))
-    for i in range(users_classes):
-        min_demand = classes[i]["demand"]["min_demand"]
-        max_demand = classes[i]["demand"]["max_demand"]
+    if classes_idx is None:
+        classes_idx = [0]
+
+
+    conv_rates = np.zeros((len(classes_idx), numbers_of_products, different_value_of_prices))
+    for i in range(len(classes_idx)):
+        min_demand = classes[classes_idx[i]]["demand"]["min_demand"]
+        max_demand = classes[classes_idx[i]]["demand"]["max_demand"]
         # Define a maximum value of conversion rates for every user class
         conv_rates[i] = npr.uniform(min_demand, max_demand, (numbers_of_products, different_value_of_prices))
+    features= []
+    for i in range(len(classes_idx)):
+        features.append(classes[classes_idx[i]]["features"])
 
     """
         Conversion rates are chosen uniform between 0 and a max[i]
@@ -95,16 +102,16 @@ def user_distribution():
     """
 
     #                                           2 Create num of users
-    total_users = distribute_total_user()
+    total_users = distribute_total_user(classes_idx)
 
     #                                           3 Create alpha ratios
-    alpha_ratios = distribute_alpha()
+    alpha_ratios = distribute_alpha(classes_idx)
 
     #                                           4 Create number of products sold
     # Uncorrelated with the actual price ??
-    n_items_bought = np.zeros((users_classes, numbers_of_products))
-    for i in range(users_classes):
-        max_item_bought = classes[i]["n_items_buyed"]["max_item_bought"]
+    n_items_bought = np.zeros((len(classes_idx), numbers_of_products))
+    for i in range(len(classes_idx)):
+        max_item_bought = classes[classes_idx[i]]["n_items_buyed"]["max_item_bought"]
         n_items_bought[i] = npr.uniform(1, max_item_bought, numbers_of_products).astype(int)
 
     """
@@ -114,12 +121,12 @@ def user_distribution():
 
     #                                           5 Create graph probabilities
     # FULLY CONNECTED
-    graph_weights = np.zeros((users_classes, numbers_of_products, numbers_of_products))
-    max_demand = np.zeros(users_classes)
+    graph_weights = np.zeros((len(classes_idx), numbers_of_products, numbers_of_products))
+    max_demand = np.zeros(len(classes_idx))
 
-    for i in range(users_classes):
-        min_graph_probability = classes[i]["graph"]["min_probability"]
-        max_graph_probability = classes[i]["graph"]["max_probability"]
+    for i in range(len(classes_idx)):
+        min_graph_probability = classes[classes_idx[i]]["graph"]["min_probability"]
+        max_graph_probability = classes[classes_idx[i]]["graph"]["max_probability"]
         # Define a maximum value of graph_weight for every user class
         max_demand[i] = npr.uniform(min_graph_probability, max_graph_probability)
         graph_weights[i] = npr.uniform(0, max_demand[i], (numbers_of_products, numbers_of_products))
@@ -128,7 +135,7 @@ def user_distribution():
     # second type of graph set to 0 only certain values
     # NOT FULLY CONNECTED
     graph_weights_not_fully_connected = np.copy(graph_weights)
-    for z in range(users_classes):
+    for z in range(len(classes_idx)):
         for i in range(numbers_of_products):
             how_many_set_to_zero = int(round((numbers_of_products-2) * npr.random()))
             set_to_zero = (npr.choice(numbers_of_products, how_many_set_to_zero, replace=False)).astype(int)
@@ -142,4 +149,4 @@ def user_distribution():
     else:
         graph = graph_weights_not_fully_connected
 
-    return total_users, alpha_ratios, graph, n_items_bought, conv_rates
+    return total_users, alpha_ratios, graph, n_items_bought, conv_rates, features
