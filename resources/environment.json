@@ -5,44 +5,44 @@
     "max_users": 300,
     "seed": 2000,
     "secondary": [
-            [2, 3],
-            [0, 4],
             [1, 3],
-            [1, 2],
-            [3, 0]
+            [0, 2],
+            [3, 0],
+            [2, 4],
+            [0, 1]
         ]
   },
   "product": {
     "products": [
       {
-        "name": "DVD",
-        "cost": 9,
-        "price": [15,17,20,25]
-      },
-      {
-        "name": "Statue",
-        "cost": 15,
-        "price": [21,23,25,30]
-      },
-      {
-        "name": "Keyholder",
+        "name": "notebook",
         "cost": 1,
-        "price": [4,5,7,8]
+        "price": [1.99, 2.49, 2.99, 3.49]
       },
       {
-        "name": "Cup",
-        "cost": 4,
-        "price": [8,10,12,15]
+        "name": "pen",
+        "cost": 0.5,
+        "price": [0.99, 1.20, 1.5, 1.99]
       },
       {
-        "name": "Poster",
+        "name": "pencil case",
+        "cost": 2,
+        "price": [3.99, 4.5, 4.99, 5.99]
+      },
+      {
+        "name": "diary",
+        "cost": 3,
+        "price": [8.99, 9.99, 11.99, 14.99]
+      },
+      {
+        "name": "calculator",
         "cost": 4,
-        "price": [10,13,15,16]
+        "price": [5.99, 6.99, 7.99, 9.99]
       }
     ],
     "different_value_of_prices": 4,
     "numbers_of_products": 5,
-    "lambda": 0.8
+    "lambda": 0.7
   },
   "users": {
     "features": ["student", "professor"],
@@ -51,20 +51,18 @@
         "name": "Student",
         "features": [true, false],
         "alpha": {
-          "alpha_weights": [0.4, 0.7, 0.5, 0.3, 0.6, 0.7],
-          "min_alpha": 0.3,
-          "max_alpha": 0.8
+          "alpha_weights": [0.4, 0.8, 0.7, 0.8, 0.7, 0.6]
         },
         "total_user": {
           "mean_users_per_class": 200,
           "user_per_class_std": 30
         },
         "demand": {
-          "min_demand": 0.4,
+          "min_demand": 0.3,
           "max_demand": 0.7
         },
         "n_items_buyed": {
-          "max_item_bought": 5
+          "max_item_bought": 15
         },
         "graph": {
           "min_probability": 0.6,
@@ -75,20 +73,18 @@
         "name": "Worker",
         "features": [false, false],
         "alpha": {
-          "alpha_weights": [0.4, 0.6, 0.3, 0.8, 0.6, 0.3],
-          "min_alpha": 0.3,
-          "max_alpha": 0.8
+          "alpha_weights": [0.4, 0.5, 0.8, 0.6, 0.7, 0.3]
         },
         "total_user": {
-          "mean_users_per_class": 80,
+          "mean_users_per_class": 50,
           "user_per_class_std": 10
         },
         "demand": {
           "min_demand": 0.5,
-          "max_demand": 0.9
+          "max_demand": 0.8
         },
         "n_items_buyed": {
-          "max_item_bought": 15
+          "max_item_bought": 8
         },
         "graph": {
           "min_probability": 0.2,
@@ -99,13 +95,11 @@
         "name": "Professor",
         "features": [false, true],
         "alpha": {
-          "alpha_weights": [0.4, 0.6, 0.4, 0.3, 0.8, 0.8],
-          "min_alpha": 0.3,
-          "max_alpha": 0.8
+          "alpha_weights": [0.4, 0.7, 0.8, 0.6, 0.8, 0.3]
         },
         "total_user": {
-          "mean_users_per_class": 40,
-          "user_per_class_std": 5
+          "mean_users_per_class": 80,
+          "user_per_class_std": 20
         },
         "demand": {
           "min_demand": 0.6,
