@@ -34,7 +34,7 @@ if debug_print_distribution:
     plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates, classes_idx)
 
 
-greedy = GreedyReward(lamb, secondary, users)
+greedy = GreedyReward(lamb, secondary, users, [0])
 # Get the margins at the lowest price.
 best_margins = greedy.bestReward()
 d = greedy.list_prices.copy()

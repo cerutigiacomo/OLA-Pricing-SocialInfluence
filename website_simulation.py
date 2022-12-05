@@ -29,7 +29,7 @@ def simulate_multiple_days(sim, users, classes_idx, days=days_simulation):
         # Change the prices, alpha, total_users daily
         new_alpha = distribute_alpha(classes_idx)
         new_total_users = distribute_total_user(classes_idx)
-        for i in range(users_classes):
+        for i in classes_idx:
             users[i].alpha = new_alpha[i]
             users[i].total_users = new_total_users[i]
         sim.prices, sim.margins, sim.today = distribute_prices()

@@ -3,21 +3,22 @@ from website_simulation import *
 from resources.define_distribution import *
 
 
-debug = False
+debug = True
 
 
 class GreedyReward:
-    def __init__(self, lamb, secondary, users) -> None:
+    def __init__(self, lamb, secondary, users, class_indexes) -> None:
         self.lamb = lamb
         self.secondary = secondary
         self.users = users
         self.ite = 0
         self.prices_index = [0, 0, 0, 0, 0]
+        self.class_indexes = class_indexes
         # Find the reward with the lowest price
         prices, margins = self.get_prices(self.prices_index)
         self.sim = Simulator(prices, margins, lamb, secondary, self.prices_index)
         self.sim.prices, self.sim.margins = self.get_prices(self.prices_index)
-        self.reward = website_simulation(self.sim, self.users)
+        self.reward = simulate_multiple_days(self.sim, self.users, self.class_indexes)
         if debug:
             print("index:", self.prices_index, "margin: ", self.reward, "sum: ", np.sum(self.reward))
         self.list_prices = np.append(np.array([]), str(self.prices_index))
@@ -42,7 +43,7 @@ class GreedyReward:
             self.sim.prices, self.sim.margins = self.get_prices(temp_index)
             self.sim.prices_index = temp_index
             # Evaluate the reward for a single arm
-            curr_reward = website_simulation(self.sim, self.users)
+            curr_reward = simulate_multiple_days(self.sim, self.users, self.class_indexes)
             rewards[i] = curr_reward
             if debug:
                 print("index:", temp_index, "margin: ", curr_reward, "sum: ", np.sum(curr_reward))
