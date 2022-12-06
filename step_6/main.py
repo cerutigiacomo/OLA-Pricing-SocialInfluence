@@ -2,9 +2,7 @@ from simulator import *
 from users import *
 from website_simulation import *
 from plotting.plot_distributions import *
-from resources.define_distribution import *
 from website_simulation import *
-import json
 from UCB_SW_algorithm import *
 from NS_environment import *
 import matplotlib.pyplot as plt

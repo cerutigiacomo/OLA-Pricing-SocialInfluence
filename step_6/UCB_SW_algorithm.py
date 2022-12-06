@@ -1,6 +1,7 @@
 from UCB_algorithm import *
 
 class UCB_SW_algorithm(UCB_algorithm):
+
     def __init__(self, n_arms, window_size):
         super().__init__(n_arms)
         self.window_size = window_size

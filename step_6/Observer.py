@@ -10,7 +10,6 @@ class Observer:
         self.pulled_arms = np.array([])
 
     def update_rewards(self, pulled_arm, reward):
-
         self.rewards_per_arm[pulled_arm].append(reward)
         self.pulled_arms = np.append(self.pulled_arms, float(pulled_arm))
         self.total_rewards = np.append(self.total_rewards, reward)

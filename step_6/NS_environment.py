@@ -1,6 +1,7 @@
 from Environment import *
 
 class NS_environment(Environment):
+
     def __init__(self, n_arms, probabilities, horizon):
         super().__init__(n_arms, probabilities)
         self.t = 0
