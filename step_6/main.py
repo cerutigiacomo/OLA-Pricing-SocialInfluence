@@ -26,7 +26,7 @@ users_classes = len(classes)
 demand_curve = npr.rand(5, 4)
 
 horizon = 350
-n_experiments = 300
+n_experiments = 30
 # single: per every single experiment
 swucb_single_reward = []
 ucb_single_reward = []
@@ -92,7 +92,7 @@ plt.legend(['UCB1','SW-UCB1'])
 plt.show()
 
 # Boolean to start the simulation and plot the graphs
-wanna_simulate = False
+wanna_simulate = True
 
 if wanna_simulate:
     # DEFINE THE SIMULATOR
@@ -101,20 +101,21 @@ if wanna_simulate:
     sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 
     # DEFINE 3 CLASS OF USERS
-    total_users, alpha_ratios, graph, n_items_bought, demand_curve = user_distribution()
+    classes_idx = [i for i in range(users_classes)]
+    total_users, alpha_ratios, graph, n_items_bought, demand_curve, features = user_distribution(classes_idx)
 
+    users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], demand_curve[i], features[i])
+             for i in range(users_classes)]
     # TODO: maybe run the sim just once for a class with new demand curve,
     # instead of 3 times with the same curve
 
-    # general class with abrupt demand changes
-    users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], demand_curve[i])
-             for i in range(users_classes)]
+
 
     max_item_bought = data["simulator"]["max_item_bought"]
 
     # Plot distributions
     plot_simulator(margins, prices, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, demand_curve)
+    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, demand_curve, classes_idx)
 
     # RUN the simulation
     days = data["simulator"]["days"]
