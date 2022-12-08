@@ -1,10 +1,8 @@
 from simulator import *
 from users import *
 from website_simulation import *
-from plotting.plot_distributions import *
-from website_simulation import *
 from UCB_SW_algorithm import *
-from NS_environment import *
+from Environment.NS_Environment import *
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as npr
@@ -20,7 +18,6 @@ numbers_of_products = data["product"]["numbers_of_products"]
 classes = data["users"]["classes"]
 users_classes = len(classes)
 
-
 # Random conversion rate (demand curve) generating number between [0, 1)
 # one matrix simulating a class of users subjected to abrupt changes
 demand_curve = npr.rand(5, 4)
@@ -32,19 +29,20 @@ swucb_single_reward = []
 ucb_single_reward = []
 window_size = int(np.sqrt(horizon))
 
+regret_ucb = np.zeros((n_experiments, horizon))
 
 for e in range(0, n_experiments):
-    print(e)
+    print("Iteration no: ", e)
     # set the UCB1 env
-    sw_env = NS_environment(n_arms, demand_curve, horizon)
+    ucb_env = NS_Environment(n_arms, demand_curve, horizon)
     ucb_learner = UCB_algorithm(n_arms)
     # set the Sliding Window UCB1 env
-    swucb_env = NS_environment(n_arms, demand_curve, horizon)
+    swucb_env = NS_Environment(n_arms, demand_curve, horizon)
     swucb_learner = UCB_SW_algorithm(n_arms, window_size)
 
     for t in range(0, horizon):
         pulled_arm = ucb_learner.pull_arm()
-        reward = sw_env.round(pulled_arm)
+        reward = ucb_env.round(pulled_arm)
         ucb_learner.update(pulled_arm, reward)
 
         pulled_arm = swucb_learner.pull_arm()
@@ -108,8 +106,6 @@ if wanna_simulate:
              for i in range(users_classes)]
     # TODO: maybe run the sim just once for a class with new demand curve,
     # instead of 3 times with the same curve
-
-
 
     max_item_bought = data["simulator"]["max_item_bought"]
 

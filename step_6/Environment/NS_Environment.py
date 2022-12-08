@@ -1,6 +1,6 @@
-from Environment import *
+from step_6.Environment.Environment import *
 
-class NS_environment(Environment):
+class NS_Environment(Environment):
 
     def __init__(self, n_arms, probabilities, horizon):
         super().__init__(n_arms, probabilities)
