@@ -4,6 +4,7 @@ from resources.define_distribution import *
 from simulator import Simulator
 from website_simulation import *
 
+debug = False
 
 class Learner:
     def __init__(self, lamb, secondary, users, n_prices, class_indexes, n_products=numbers_of_products, ):
@@ -67,21 +68,21 @@ class UCBLearner(Learner):
         def scale_min_max():
             max_value = np.max(self.means.flatten())
             min_value = np.min(self.means.flatten())
-            x = self.means.copy()
-            x_scaled = (x - min_value) / (max_value - min_value)
+            x_scaled = (self.means - min_value) / (max_value - min_value)
             return x_scaled
-
+        # TODO : find better solution than simply scaling with current maximum and minimum
         scaled_means = scale_min_max()
-        print("SCALED CONFIDENCE ON REWARDS : \n", scaled_means + self.widths)
+        if debug:
+            print("SCALED CONFIDENCE ON REWARDS : \n", scaled_means + self.widths)
         # return np.argmax(self.means + self.widths, axis=1)
         return np.argmax(scaled_means + self.widths, axis=1)
 
     def update(self, price_pulled, reward):
         # MAIN UPDATE FOR RESULTS PRESENTATION
         super().update(price_pulled, reward)
-
-        print("PRICE PULLED : \n", price_pulled)
-        print("REWARD OBSERVED : \n", reward)
+        if debug:
+            print("PRICE PULLED : \n", price_pulled)
+            print("REWARD OBSERVED : \n", reward)
 
         # update confidence bounds
 
@@ -114,8 +115,9 @@ class UCBLearner(Learner):
         return observed_reward
 
     def debug(self):
-        print("LEARNER BOUNDS ...")
-        print("means : \n", self.means)
-        print("arms counter : \n", self.arm_counters)
-        print("widths : \n", self.widths)
-        print("confidence : \n", self.means + self.widths)
+        if debug:
+            print("LEARNER BOUNDS ...")
+            print("means : \n", self.means)
+            print("arms counter : \n", self.arm_counters)
+            print("widths : \n", self.widths)
+            print("confidence : \n", self.means + self.widths)
