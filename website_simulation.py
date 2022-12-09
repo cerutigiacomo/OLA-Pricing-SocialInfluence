@@ -15,7 +15,7 @@ def website_simulation(sim, users):
     total_rewards = np.zeros(5, np.float16)
     for user_class in users:
         total_rewards += run_for_alpha_ratio(user_class, sim)
-    # return run_for_total_user(user_class, sim, total_rewards)
+
     return total_rewards
 
 
@@ -32,24 +32,10 @@ def simulate_multiple_days(sim, users, classes_idx, days=days_simulation):
         for i in classes_idx:
             users[i].alpha = new_alpha[i]
             users[i].total_users = new_total_users[i]
-        sim.prices, sim.margins, sim.today = distribute_prices()
+        sim.prices_greedy, sim.margins, sim.today = distribute_prices()
 
     # plot_reward(total_reward)
     return total_reward
-
-
-def run_for_total_user(user_class, sim, total_rewards):
-    for i in range(user_class.total_users - 1):
-        sim.visited_primaries = []
-        j = int(np.random.choice(numbers_of_products + 1, 1, p=user_class.alpha))
-        if j == 0:
-            # The competitor has been selected!
-            continue
-        j -= 1
-        rewards = sim.simulation(j, user_class)
-        total_rewards += rewards
-
-        return total_rewards
 
 
 """ From the text

@@ -3,7 +3,7 @@ import json
 
 f = open('../resources/environment.json')
 data = json.load(f)
-
+npr.seed(data["simulator"]["seed"])
 
 class Users_group:
     # This class defines a single group of users that is meant to visit the ecommerce website
@@ -23,5 +23,4 @@ class Users_group:
         self.conv_rates = conv_rates
 
     def get_n_items_to_buy(self, product):
-        npr.seed(data["simulator"]["seed"])
         return int(npr.uniform(1, self.n_items_bought[product]))

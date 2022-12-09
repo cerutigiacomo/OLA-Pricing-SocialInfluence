@@ -93,10 +93,11 @@ def plot_reward(reward):
 def plot_result_simulation(reward, visited):
     colors = ["r", "g", "b", "y", 'r']
     plt.rcParams["figure.figsize"] = (50, 10)
-    plt.plot(reward, 'o', mfc='none')
+    plt.plot(reward, 'o-', mfc='none')
     plt.xticks(list(range(len(reward))), visited,  rotation='vertical')
     plt.xlabel('Iterations')
     plt.ylabel('Reward')
     plt.grid()
 
     plt.show()
+
