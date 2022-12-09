@@ -63,7 +63,7 @@ print("Effettivi valori di margine : \n", clairvoyant_margin_values)
 learner = UCBLearner(lamb, secondary, users, 4, [0])
 
 #
-for iterations in range(100):
+for iterations in range(1000):
     learner.debug()
     price_pulled = learner.act()
     reward_observed = learner.simulate(price_pulled)
@@ -75,7 +75,7 @@ y = learner.list_margins
 x_values = [i for i in range(x_labels.shape[0])]
 print(x_labels,y)
 
-fig = plt.figure(figsize=(30, 10))
+fig = plt.figure(figsize=(50, 10))
 plt.plot(x_values,y)
 plt.xticks(ticks=x_values,labels=x_labels,rotation=90)
 
