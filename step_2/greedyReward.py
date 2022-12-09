@@ -18,7 +18,7 @@ class GreedyReward:
         prices, margins = self.get_prices(self.prices_index)
         self.sim = Simulator(prices, margins, lamb, secondary, self.prices_index)
         self.sim.prices, self.sim.margins = self.get_prices(self.prices_index)
-        self.reward = simulate_multiple_days(self.sim, self.users, self.class_indexes)
+        self.reward = website_simulation(self.sim, self.users)
         if debug:
             print("index:", self.prices_index, "margin: ", self.reward, "sum: ", np.sum(self.reward))
         self.list_prices = np.append(np.array([]), str(self.prices_index))
@@ -43,7 +43,7 @@ class GreedyReward:
             self.sim.prices, self.sim.margins = self.get_prices(temp_index)
             self.sim.prices_index = temp_index
             # Evaluate the reward for a single arm
-            curr_reward = simulate_multiple_days(self.sim, self.users, self.class_indexes)
+            curr_reward = website_simulation(self.sim, self.users)
             rewards[i] = curr_reward
             if debug:
                 print("index:", temp_index, "margin: ", curr_reward, "sum: ", np.sum(curr_reward))
