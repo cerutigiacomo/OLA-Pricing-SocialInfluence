@@ -1,10 +1,5 @@
-from simulator import Simulator
 from users import *
-from plotting.plot_distributions import *
-from resources.define_distribution import *
-import json
-import matplotlib.pyplot as plt
-from step_3.Learner import UCBLearner
+from UCBLearner import *
 
 f = open('../resources/environment.json')
 data = json.load(f)
@@ -64,7 +59,7 @@ print("Effettivi valori di margine : \n", clairvoyant_margin_values)
 learner = UCBLearner(lamb, secondary, users, 4, [0])
 
 #
-for iterations in range(1000):
+for iterations in range(10):
     learner.debug()
     price_pulled = learner.act()
     reward_observed = learner.simulate(price_pulled)
@@ -74,7 +69,7 @@ x_labels = learner.list_prices
 y = learner.list_margins
 
 x_values = [i for i in range(x_labels.shape[0])]
-print(x_labels, y)
+# print(x_labels, y)
 
 fig = plt.figure(1,figsize=(70, 12))
 plt.plot(x_values, y)

@@ -1,5 +1,3 @@
-import numpy as np
-
 from users import *
 from greedyReward import *
 from plotting.plot_distributions import *
@@ -21,14 +19,14 @@ def get_all_margins():
 
 def clairvoyant_sol():
     conv_prices = (get_all_margins() * users[0].conv_rates)
-    a = np.argmax(conv_prices, axis=1)
+    indexes = np.argmax(conv_prices, axis=1)
     #a = [1, 0, 1, 1, 1]
-    sim.prices, sim.margins = GreedyReward.get_prices(a)
+    sim.prices, sim.margins = get_prices_and_margins(indexes)
     reward = np.zeros((5,5))
     for i in range(5):
-        reward[i] = website_simulation(sim, users)
+        reward[i], a, b, c = website_simulation(sim, users)
     rew = np.max(reward, axis=0)
-    return rew, a
+    return rew, indexes
 
 
 

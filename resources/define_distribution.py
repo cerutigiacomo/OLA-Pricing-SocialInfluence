@@ -139,3 +139,10 @@ def user_distribution(classes_idx=None):
         graph = graph_weights_not_fully_connected
 
     return total_users, alpha_ratios, graph, n_items_bought, conv_rates, features
+
+
+def get_prices_and_margins(index):
+    products = get_product()
+    prices = [products[i]["price"][index[i]] for i in range(numbers_of_products)]
+    margin = [products[i]["price"][index[i]] - products[i]["cost"] for i in range(numbers_of_products)]
+    return prices, margin

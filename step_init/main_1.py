@@ -5,14 +5,14 @@ from plotting.plot_distributions import *
 from resources.define_distribution import *
 import json
 
-debug_print_distribution = True
+debug_print_distribution = False
 f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 
 
 def simple_run():
-    reward = website_simulation(sim, users)
+    reward, a, b, c = website_simulation(sim, users)
     np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
     print("total revenue ", reward)
 
