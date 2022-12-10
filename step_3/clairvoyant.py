@@ -48,7 +48,7 @@ def find_clairvoyant_reward(learner, clairvoyant_price_index):
     # NOTE : running the algorithm for 1000 or more iterations shows the limit of this clairvoyant solution
 
     fig = plt.figure(1, figsize=(70, 12))
-    plt.plot(x_labels, margin)
+    plt.plot(x_values, margin)
     plt.xticks(ticks=x_values, labels=x_labels, rotation=90)
     plt.plot(x_values, np.repeat(y_clairvoyant, len(x_values)), "r-")
     plt.grid()

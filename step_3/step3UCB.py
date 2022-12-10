@@ -25,8 +25,8 @@ learner = UCBLearner(lamb, secondary, users, 4, [0])
 iteration = 1000
 
 final_reward= np.zeros(iteration)
-final_cumulative_regret = np.zeros(iteration)
-final_cumulative_reward = np.zeros(iteration)
+cumulative_regret = np.zeros(iteration)
+cumulative_reward = np.zeros(iteration)
 
 for iterations in range(iteration):
     learner.debug()
@@ -40,18 +40,16 @@ y_clairvoyant = find_clairvoyant_reward(learner, clairvoyant_price_index)
 # Plot UCB Regret and Reward
 clairvoyant_margin = y_clairvoyant
 clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin)
-final_cumulative_reward = np.cumsum(learner.list_margins)
-final_cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
+cumulative_reward = np.cumsum(learner.list_margins)
+cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
 final_reward = learner.list_margins
 
-plot_regret_reward(final_cumulative_regret,
-                   final_cumulative_reward,
+plot_regret_reward(cumulative_regret,
+                   cumulative_reward,
                    final_reward,
-                   [clairvoyant_margin for i in range(iteration)],
                    clairvoyant_margin,
                    label_alg= "Step3UCB",
                    day = iteration)
-
 
 
 # show arms confidence
