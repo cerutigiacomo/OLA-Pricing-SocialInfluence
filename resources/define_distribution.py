@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.random as npr
 import json
+from users  import Users_group
 
 f = open('../resources/environment.json')
 data = json.load(f)
@@ -139,3 +140,20 @@ def user_distribution(classes_idx=None):
         graph = graph_weights_not_fully_connected
 
     return total_users, alpha_ratios, graph, n_items_bought, conv_rates, features
+
+def get_users(classes_idx=None):
+    if classes_idx is None:
+        classes_idx = [0]
+    users = []
+    total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
+    for i in range(len(classes_idx)):
+        users.append(Users_group(total_users, alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], features[i]))
+
+    return users
+
+
+def get_prices_and_margins(index):
+    products = get_product()
+    prices = [products[i]["price"][index[i]] for i in range(numbers_of_products)]
+    margin = [products[i]["price"][index[i]] - products[i]["cost"] for i in range(numbers_of_products)]
+    return prices, margin

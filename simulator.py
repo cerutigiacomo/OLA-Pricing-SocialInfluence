@@ -12,31 +12,30 @@ class Simulator:
         self.margins = margins
         self.lamb = lamb
         self.visited_primaries = []
+        self.items_bought = np.zeros(5)
+        self.items_rewards = np.zeros(5)
         self.secondary_product = secondary
         self.prices_index = prices_index
 
     def reset(self):
         self.visited_primaries = []
+        self.items_bought = np.zeros(5)
+        self.items_rewards = np.zeros(5)
 
     def simulation(self, j, user_class):
         # This recursive method simulates one user landing on a webpage of one product.
         # Rewards depend on conversion rates, price point, number of items bought, margins and graph_weights
         # secondary products and calls itself recursively to add the rewards of the next primary.
 
-        # The Graph weight has to be set to
-
-        # Compute reward for buying the primary
         rewards = np.zeros(5, np.float16)
 
-        # "she/he buys a number of units of the primary product
-        # if the price of a single unit is under the user’ reservation price"
-
-        # TODO REVIEW!
         # bernoullli launch with probability of the user class conversion rate
         conversion_factor = bernoulli.rvs(user_class.conv_rates[j][self.prices_index[j]], size=1)
+        items = user_class.get_n_items_to_buy(j)
         rewards[j] = self.margins[j] * \
-                     user_class.get_n_items_to_buy(j) * \
+                     items * \
                      conversion_factor
+
 
         # Add the current product to the visited ones.
         self.visited_primaries.append(j)
@@ -47,6 +46,9 @@ class Simulator:
         if not conversion_factor:
             # Return if the user do not but any item of this product
             return [0 for _ in range(5)]
+        else:
+            self.items_bought[j] += items
+            self.items_rewards[j] += rewards[j]
         # print("bought: ", user_class.n_items_bought[j], " items of product: ", j)
 
         # FIRST SECONDARY

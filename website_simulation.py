@@ -1,4 +1,3 @@
-import numpy.random as npr
 from resources.define_distribution import *
 from plotting.plot_distributions import *
 import json
@@ -13,16 +12,22 @@ def website_simulation(sim, users):
     # This method simulates users visiting the ecommerce website
     # returns total rewards for all five products
     total_rewards = np.zeros(5, np.float16)
-    for user_class in users:
-        total_rewards += run_for_alpha_ratio(user_class, sim)
+    product_visited = [[] for _ in range(len(users))]
+    items_bought = [[] for _ in range(len(users))]
+    items_rewards = [[] for _ in range(len(users))]
 
-    return total_rewards
+    for user_class in users:
+        index = users.index(user_class)
+        reward, product_visited[index], items_bought[index], items_rewards[index] = run_for_alpha_ratio(user_class, sim)
+        total_rewards += reward
+
+    return total_rewards, product_visited, items_bought, items_rewards
 
 
 def simulate_multiple_days(sim, users, classes_idx, days=days_simulation):
     total_reward = np.zeros(numbers_of_products)
     for j in range(days):
-        reward = website_simulation(sim, users)
+        reward, a, b, c = website_simulation(sim, users)
         # np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
         # print("total revenue ", reward)
         total_reward += reward
@@ -46,7 +51,9 @@ We use the Alpha ratio and the total number of users. for iterating on the singl
 
 def run_for_alpha_ratio(user_class, sim):
     rewards_count = []
-    visited = []
+    product_visited = []
+    items_bought = []
+    items_rewards = []
     total_rewards = np.zeros(5, np.float16)
     alpha = user_class.alpha
     for i in range(numbers_of_products + 1):
@@ -56,9 +63,13 @@ def run_for_alpha_ratio(user_class, sim):
         for j in range(int(alpha[i] * user_class.total_users)):
             sim.reset()
             rewards = sim.simulation(i - 1, user_class)
-            visited.append(sim.visited_primaries)
+
+            product_visited.append(sim.visited_primaries)
+            items_bought.append(sim.items_bought)
+            items_rewards.append(sim.items_rewards)
+
             rewards_count.append(np.sum(rewards))
             total_rewards += rewards
 
     # plot_result_simulation(rewards_count, visited)
-    return total_rewards
+    return total_rewards, product_visited, items_bought, items_rewards
