@@ -1,21 +1,15 @@
-from users import *
 from greedyReward import *
 from plotting.plot_distributions import *
 from resources.define_distribution import *
 from plot_greedy import *
 import json
 
-debug_print_distribution = False
+debug_print_distribution = True
 f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 
-def get_all_margins():
-    data_ = [data["product"]["products"][i] for i in range(5)]
-    margin = np.zeros((4,5))
-    for j in range(4):
-        margin[j] = np.array([data_[i]["price"][j] - data_[i]["cost"] for i in range(5)])
-    return margin.transpose()
+
 
 def clairvoyant_sol():
     conv_prices = (get_all_margins() * users[0].conv_rates)
@@ -41,15 +35,12 @@ sim = Simulator(prices_greedy, margins, lamb, secondary, [today for _ in range(5
 
 # DEFINE 1 CLASS OF USERS, the 1st one
 classes_idx = [0]
-total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
-
-users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], features[i])
-         for i in range(len(classes_idx))]
+users = get_users(classes_idx)
 
 # Plot distributions
 if debug_print_distribution:
-    plot_simulator(margins, prices_greedy, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates, classes_idx)
+    plot_simulator(sim)
+    plot_users(users, classes_idx)
 
 reward_sol, b_m = clairvoyant_sol()
 

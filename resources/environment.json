@@ -49,6 +49,7 @@
     "classes": [
       {
         "name": "Student",
+        "reservation_price": 10,
         "features": [true, false],
         "alpha": {
           "alpha_weights": [0.4, 0.8, 0.7, 0.65, 0.5, 0.6]
@@ -71,6 +72,7 @@
       },
       {
         "name": "Worker",
+        "reservation_price": 15,
         "features": [false, false],
         "alpha": {
           "alpha_weights": [0.4, 0.5, 0.8, 0.6, 0.7, 0.3]
@@ -93,6 +95,7 @@
       },
       {
         "name": "Professor",
+        "reservation_price": 13,
         "features": [false, true],
         "alpha": {
           "alpha_weights": [0.4, 0.7, 0.8, 0.6, 0.8, 0.3]

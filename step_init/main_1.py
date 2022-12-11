@@ -8,7 +8,6 @@ import json
 debug_print_distribution = False
 f = open('../resources/environment.json')
 data = json.load(f)
-max_item_bought = data["simulator"]["max_item_bought"]
 
 
 def simple_run():
@@ -26,15 +25,12 @@ sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 
 # DEFINE 3 CLASS OF USERS
 classes_idx = [i for i in range(users_classes)]
-total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
-
-users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], features[i])
-         for i in range(users_classes)]
+users = get_users(classes_idx)
 
 # Plot distributions
 if debug_print_distribution:
-    plot_simulator(margins, prices, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates, classes_idx)
+    plot_simulator(sim)
+    plot_users(users, classes_idx)
 
 # RUN the simulation
 days = data["simulator"]["days"]

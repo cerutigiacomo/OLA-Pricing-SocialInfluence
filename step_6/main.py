@@ -1,7 +1,4 @@
 from simulator import *
-from users import *
-from website_simulation import *
-from plotting.plot_distributions import *
 from website_simulation import *
 from UCB_SW_algorithm import *
 from NS_environment import *
@@ -102,10 +99,7 @@ if wanna_simulate:
 
     # DEFINE 3 CLASS OF USERS
     classes_idx = [i for i in range(users_classes)]
-    total_users, alpha_ratios, graph, n_items_bought, demand_curve, features = user_distribution(classes_idx)
-
-    users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], demand_curve[i], features[i])
-             for i in range(users_classes)]
+    users = get_users(classes_idx)
     # TODO: maybe run the sim just once for a class with new demand curve,
     # instead of 3 times with the same curve
 
@@ -114,8 +108,8 @@ if wanna_simulate:
     max_item_bought = data["simulator"]["max_item_bought"]
 
     # Plot distributions
-    plot_simulator(margins, prices, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, demand_curve, classes_idx)
+    plot_simulator(sim)
+    plot_users(users, classes_idx)
 
     # RUN the simulation
     days = data["simulator"]["days"]

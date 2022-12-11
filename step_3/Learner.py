@@ -19,7 +19,6 @@ class Learner:
         # TODO REVIEW : DO WE NEED INITIALIZATION OF FOLLOWING DATA ?
         prices, margins = get_prices_and_margins(self.prices_index)
         self.sim = Simulator(prices, margins, lamb, secondary, self.prices_index)
-        self.sim.prices, self.sim.margins = get_prices_and_margins(self.prices_index)
         self.reward = [0 for _ in range(n_products)]
 
         # list prices used to index x-axis

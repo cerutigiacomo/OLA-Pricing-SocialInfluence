@@ -6,12 +6,12 @@ f = open('../resources/environment.json')
 data = json.load(f)
 days = data["simulator"]["days"]
 
-def mean_std(data, day=days):
-    mean = np.mean(data, axis=0)
-    std = np.std(data, axis=0) / np.sqrt(day)
+def mean_std(data_, day=days):
+    mean = np.mean(data_, axis=0)
+    std = np.std(data_, axis=0) / np.sqrt(day)
     # TODO iterate the learner more times and get the mean of the results!
     # return mean, std
-    return data, 0
+    return data_, 0
 
 def plot_regret_reward(cumulative_regret,
                        cumulative_reward,

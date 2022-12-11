@@ -9,9 +9,14 @@ numbers_of_products = data["product"]["numbers_of_products"]
 users_classes = len(data["users"]["classes"])
 colors = ["r", "g", "b", "y"]
 classes = data["users"]["classes"]
+max_item_bought = data["simulator"]["max_item_bought"]
 
 
-def plot_simulator(margins, prices, secondary):
+def plot_simulator(sim):
+    margins = sim.margins
+    prices = sim.prices
+    secondary = sim.secondary_product
+
     fig, axs = plt.subplots(ncols=2)
     axs[0].plot(list(range(numbers_of_products)), margins, 'o', label="margins")
     axs[0].plot(list(range(numbers_of_products)), prices, 'x', label='prices')
@@ -27,7 +32,13 @@ def plot_simulator(margins, prices, secondary):
     plt.show()
 
 
-def plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, conv_rates, classes_idx):
+def plot_users(users, classes_idx):
+    total_users = [users[i].total_users for i in range(len(classes_idx))]
+    alpha_ratios = [users[i].alpha for i in range(len(classes_idx))]
+    graph = [users[i].graph_weights for i in range(len(classes_idx))]
+    n_items_bought = [users[i].n_items_bought for i in range(len(classes_idx))]
+    conv_rates = [users[i].conv_rates for i in range(len(classes_idx))]
+
     fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(15, 10), gridspec_kw={'width_ratios': [2, 2, 2]})
     axs[0, 0].bar(['Class ' + str(i) for i in range(len(classes_idx))], total_users)
     axs[0, 0].set_xticks(list(range(len(classes_idx))), list(range(1, 1 + len(classes_idx))))
@@ -91,7 +102,6 @@ def plot_reward(reward):
 
 
 def plot_result_simulation(reward, visited):
-    colors = ["r", "g", "b", "y", 'r']
     plt.rcParams["figure.figsize"] = (50, 10)
     plt.plot(reward, 'o-', mfc='none')
     plt.xticks(list(range(len(reward))), visited,  rotation='vertical')

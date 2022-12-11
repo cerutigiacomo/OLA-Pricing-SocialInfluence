@@ -86,7 +86,7 @@ y_clairvoyant = find_clairvoyant_reward(learner, clairvoyant_price_index, iterat
 clairvoyant_margin = y_clairvoyant
 clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin)
 cumulative_reward = np.cumsum(learner.list_margins)
-cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
+cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - cumulative_reward
 final_reward = learner.list_margins
 
 plot_regret_reward(cumulative_regret,

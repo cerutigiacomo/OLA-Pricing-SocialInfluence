@@ -139,15 +139,19 @@ def user_distribution(classes_idx=None):
     else:
         graph = graph_weights_not_fully_connected
 
-    return total_users, alpha_ratios, graph, n_items_bought, conv_rates, features
+    # load reservation_prices
+    reservation_prices = np.zeros(len(classes_idx))
+    for i in range(len(classes_idx)):
+        reservation_prices[i] = classes[classes_idx[i]]["reservation_price"]
+    return total_users, alpha_ratios, graph, n_items_bought, conv_rates, reservation_prices, features
 
 def get_users(classes_idx=None):
     if classes_idx is None:
         classes_idx = [0]
     users = []
-    total_users, alpha_ratios, graph, n_items_bought, conv_rates, features = user_distribution(classes_idx)
+    total_users, alpha_ratios, graph, n_items_bought, conv_rates, reservation_prices, features = user_distribution(classes_idx)
     for i in range(len(classes_idx)):
-        users.append(Users_group(total_users, alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], features[i]))
+        users.append(Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], conv_rates[i], reservation_prices[i], features[i]))
 
     return users
 
@@ -157,3 +161,11 @@ def get_prices_and_margins(index):
     prices = [products[i]["price"][index[i]] for i in range(numbers_of_products)]
     margin = [products[i]["price"][index[i]] - products[i]["cost"] for i in range(numbers_of_products)]
     return prices, margin
+
+
+def get_all_margins():
+    data_ = [data["product"]["products"][i] for i in range(5)]
+    margin = np.zeros((4,5))
+    for j in range(4):
+        margin[j] = np.array([data_[i]["price"][j] - data_[i]["cost"] for i in range(5)])
+    return margin.transpose()
