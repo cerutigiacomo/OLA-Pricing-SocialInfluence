@@ -1,5 +1,7 @@
 from plotting.plot_reward_regret import *
 from clairvoyant import *
+from resources.Environment import Environment
+from step_3.iterate_env import iterate
 
 f = open('../resources/environment.json')
 data = json.load(f)
@@ -69,18 +71,15 @@ learner = UCBLearner(lamb, secondary, users, 4, max_reward)
 
 iteration = 1000
 
-final_reward= np.zeros(iteration)
-cumulative_regret = np.zeros(iteration)
-cumulative_reward = np.zeros(iteration)
+#final_reward= np.zeros(iteration)
+#cumulative_regret = np.zeros(iteration)
+#cumulative_reward = np.zeros(iteration)
 
-for iterations in range(iteration):
-    learner.debug()
-    price_pulled = learner.act()
-    reward_observed = learner.simulate(price_pulled)
-    learner.update(price_pulled, reward_observed)
+env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], [0])
+iterate(learner, env, iteration, clairvoyant_price_index, "step3UCB")
 
 # Clairvoyant solution
-y_clairvoyant = find_clairvoyant_reward(learner, clairvoyant_price_index, iteration)
+y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
 
 # Plot UCB Regret and Reward
 clairvoyant_margin = y_clairvoyant

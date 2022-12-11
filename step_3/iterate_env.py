@@ -6,10 +6,10 @@ def iterate(learner, env, iteration, clairvoyant_price_index, name_alg):
         learner.debug()
         price_pulled = learner.act()
         reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
-        learner.update(price_pulled, reward_observed)
+        learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
 
     # Clairvoyant solution
-    y_clairvoyant = find_clairvoyant_reward(learner, clairvoyant_price_index, iteration)
+    y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
 
     # Plot Regret and Reward
     clairvoyant_margin = y_clairvoyant

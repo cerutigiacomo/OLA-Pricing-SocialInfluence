@@ -8,8 +8,6 @@ class UCBLearner(Learner):
 
         # TODO : testing best reward given the observability of step3's variables
         self.top_reward = top_reward
-        # TODO : standard version
-        self.sample_conv_rate = np.zeros(shape=(self.n_products, self.n_arms))
 
         # upper confidence bounds of arms
         # optimistic estimation of the rewards provided by arms
@@ -37,43 +35,13 @@ class UCBLearner(Learner):
             print("SCALED CONFIDENCE ON REWARDS : \n", scaled_means + self.widths)
         return np.argmax(scaled_means + self.widths, axis=1)
 
-    def update(self, price_pulled, reward):
+    def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
         # MAIN UPDATE FOR RESULTS PRESENTATION
-        super().update(price_pulled, reward)
+        super().update(price_pulled, reward, None, None, None)
 
         if debug:
             print("PRICE PULLED : \n", price_pulled)
             print("REWARD OBSERVED : \n", reward)
-
-        # update confidence bounds
-
-        # update means
-        past_averages = self.means[np.arange(0, self.n_products), price_pulled]
-        len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
-        # self.means[np.arange(0, self.n_products), price_pulled] = ((past_averages * len_averages) + reward) / (len_averages + 1)
-        self.means[np.arange(0, self.n_products), price_pulled] = \
-            ((past_averages * len_averages) + self.sample_conv_rate[np.arange(self.n_products), price_pulled]) / (
-                        len_averages + 1)
-
-        # update counter of selected arms
-        mask_positive_rewards = np.array([True if x > 0.0 else False for x in reward])
-        for product_id in range(numbers_of_products):
-            if mask_positive_rewards[product_id]:
-                self.arm_counters[product_id, price_pulled[product_id]] += 1
-        # update counter of every arm, included the one with observed reward equal 0
-        # self.arm_counters[np.arange(0,number_of_products), price_pulled] += 1
-
-        for product in range(self.n_products):
-            for idx in range(self.n_arms):
-                if self.arm_counters[product, idx] > 0:
-                    self.widths[product, idx] = np.sqrt((2 * np.log(self.t)) / self.arm_counters[product, idx])
-                else:
-                    self.widths[product, idx] = np.inf
-
-    def simulate(self, price_pulled):
-        self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
-        self.sim.prices_index = price_pulled
-        observed_reward, product_visited, items_bought, items_rewards = website_simulation(self.sim, self.users)
 
         sample_conv_rates = np.full_like(np.array([]), fill_value=0, shape=self.n_products)
         counters = np.zeros(shape=self.n_products)
@@ -90,9 +58,29 @@ class UCBLearner(Learner):
                 / counters[mask_seen]
             # sample_conv_rates[np.isnan(sample_conv_rates)] = 0
 
-        self.sample_conv_rate[np.arange(self.n_products), price_pulled] = sample_conv_rates
+        # update confidence bounds
 
-        return observed_reward
+        # update means
+        past_averages = self.means[np.arange(0, self.n_products), price_pulled]
+        len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
+        # self.means[np.arange(0, self.n_products), price_pulled] = ((past_averages * len_averages) + reward) / (len_averages + 1)
+        self.means[np.arange(0, self.n_products), price_pulled] = \
+            ((past_averages * len_averages) + sample_conv_rates) / (len_averages + 1)
+
+        # update counter of selected arms
+        mask_positive_rewards = np.array([True if x > 0.0 else False for x in reward])
+        for product_id in range(numbers_of_products):
+            if mask_positive_rewards[product_id]:
+                self.arm_counters[product_id, price_pulled[product_id]] += 1
+        # update counter of every arm, included the one with observed reward equal 0
+        # self.arm_counters[np.arange(0,number_of_products), price_pulled] += 1
+
+        for product in range(self.n_products):
+            for idx in range(self.n_arms):
+                if self.arm_counters[product, idx] > 0:
+                    self.widths[product, idx] = np.sqrt((2 * np.log(self.t)) / self.arm_counters[product, idx])
+                else:
+                    self.widths[product, idx] = np.inf
 
     def debug(self):
         if debug:

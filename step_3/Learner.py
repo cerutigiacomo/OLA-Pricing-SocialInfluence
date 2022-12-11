@@ -1,7 +1,7 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = False
+debug = True
 
 class Learner:
     def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products, ):
@@ -33,7 +33,7 @@ class Learner:
         # select the next arm to be pulled
         pass
 
-    def update(self, price_pulled, reward):
+    def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
         # update observation list once reward is returned
         self.t += 1
         self.prices_index = price_pulled

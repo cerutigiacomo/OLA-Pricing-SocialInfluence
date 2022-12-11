@@ -34,7 +34,7 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     return best_margin_for_unit, clairvoyant_margin_values
 
 
-def find_clairvoyant_reward(learner, clairvoyant_price_index, iterations):
+def find_clairvoyant_reward(learner, env, clairvoyant_price_index, iterations):
     x_labels = learner.list_prices
     margin = learner.list_margins
 
@@ -43,7 +43,8 @@ def find_clairvoyant_reward(learner, clairvoyant_price_index, iterations):
     # TODO review
     y_clairvoyant = 0
     for i in range(iterations):
-        reward = np.sum(learner.simulate(clairvoyant_price_index))
+        reward, product_visited, items_bought, items_rewards = env.round(clairvoyant_price_index)
+        reward = np.sum(reward)
         y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)
 
     fig = plt.figure(1, figsize=(70, 12))
