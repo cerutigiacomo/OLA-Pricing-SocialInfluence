@@ -1,9 +1,15 @@
 from Learner import *
 
+
 class UCBLearner(Learner):
 
-    def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users, n_prices, top_reward=None, n_products=numbers_of_products):
         super().__init__(lamb, secondary, users, n_prices, n_products)
+
+        # TODO : testing best reward given the observability of step3's variables
+        self.top_reward = top_reward
+        # TODO : standard version
+        self.sample_conv_rate = np.zeros(shape=(self.n_products, self.n_arms))
 
         # upper confidence bounds of arms
         # optimistic estimation of the rewards provided by arms
@@ -12,24 +18,29 @@ class UCBLearner(Learner):
         self.widths = np.array([[np.inf for _ in range(self.n_arms)] for i in range(self.n_products)])
 
     def act(self):
+        # CONV RATES UNKNOWN SOLUTION
+        return np.argmax(self.means + self.widths, axis=1)
+
         def scale_min_max():
-            max_value = np.max(self.means.flatten())
+            # max_value = np.max(self.means.flatten())
+            max_value = self.top_reward
             min_value = np.min(self.means.flatten())
-            if self.t > 0 and max_value != min_value :
+            if self.t > 0 and max_value != min_value:
                 x_scaled = (self.means - min_value) / (max_value - min_value)
             else:
                 x_scaled = self.means
             return x_scaled
-        # TODO : find better solution than simply scaling with current maximum and minimum
+
         scaled_means = scale_min_max()
         if debug:
+            print("SCALED MEANS : \n", scaled_means)
             print("SCALED CONFIDENCE ON REWARDS : \n", scaled_means + self.widths)
-        # return np.argmax(self.means + self.widths, axis=1)
         return np.argmax(scaled_means + self.widths, axis=1)
 
     def update(self, price_pulled, reward):
         # MAIN UPDATE FOR RESULTS PRESENTATION
         super().update(price_pulled, reward)
+
         if debug:
             print("PRICE PULLED : \n", price_pulled)
             print("REWARD OBSERVED : \n", reward)
@@ -39,8 +50,10 @@ class UCBLearner(Learner):
         # update means
         past_averages = self.means[np.arange(0, self.n_products), price_pulled]
         len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
+        # self.means[np.arange(0, self.n_products), price_pulled] = ((past_averages * len_averages) + reward) / (len_averages + 1)
         self.means[np.arange(0, self.n_products), price_pulled] = \
-            ((past_averages * len_averages) + reward) / (len_averages + 1)
+            ((past_averages * len_averages) + self.sample_conv_rate[np.arange(self.n_products), price_pulled]) / (
+                        len_averages + 1)
 
         # update counter of selected arms
         mask_positive_rewards = np.array([True if x > 0.0 else False for x in reward])
@@ -49,7 +62,6 @@ class UCBLearner(Learner):
                 self.arm_counters[product_id, price_pulled[product_id]] += 1
         # update counter of every arm, included the one with observed reward equal 0
         # self.arm_counters[np.arange(0,number_of_products), price_pulled] += 1
-
 
         for product in range(self.n_products):
             for idx in range(self.n_arms):
@@ -61,7 +73,25 @@ class UCBLearner(Learner):
     def simulate(self, price_pulled):
         self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
         self.sim.prices_index = price_pulled
-        observed_reward, a, b, c = website_simulation(self.sim, self.users)
+        observed_reward, product_visited, items_bought, items_rewards = website_simulation(self.sim, self.users)
+
+        sample_conv_rates = np.full_like(np.array([]), fill_value=0, shape=self.n_products)
+        counters = np.zeros(shape=self.n_products)
+        for (i, (visited_i, bought_i, rewards_i)) in enumerate(
+                zip(product_visited[0], items_bought[0], items_rewards[0])):
+            seen = np.zeros(shape=numbers_of_products)
+            seen[visited_i] += 1
+            bought = np.zeros(shape=numbers_of_products)
+            bought[bought_i > 0.0] += 1
+            counters += seen
+            mask_seen = seen > 0
+            sample_conv_rates[mask_seen] = \
+                (sample_conv_rates[mask_seen] * (counters[mask_seen] - 1) + (bought[mask_seen] / seen[mask_seen])) \
+                / counters[mask_seen]
+            # sample_conv_rates[np.isnan(sample_conv_rates)] = 0
+
+        self.sample_conv_rate[np.arange(self.n_products), price_pulled] = sample_conv_rates
+
         return observed_reward
 
     def debug(self):

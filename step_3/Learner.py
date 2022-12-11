@@ -4,7 +4,7 @@ from website_simulation import *
 debug = False
 
 class Learner:
-    def __init__(self, lamb, secondary, users, n_prices, class_indexes, n_products=numbers_of_products, ):
+    def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products, ):
         self.lamb = lamb
         self.secondary = secondary
         # data disaggregation is going to be set before this function
@@ -15,12 +15,10 @@ class Learner:
         self.prices_index = np.array([0 for i in range(n_products)])
         self.n_products = n_products
         self.n_arms = n_prices
-        self.class_indexes = class_indexes
 
         # TODO REVIEW : DO WE NEED INITIALIZATION OF FOLLOWING DATA ?
         prices, margins = get_prices_and_margins(self.prices_index)
         self.sim = Simulator(prices, margins, lamb, secondary, self.prices_index)
-        self.sim.prices, self.sim.margins = get_prices_and_margins(self.prices_index)
         self.reward = [0 for _ in range(n_products)]
 
         # list prices used to index x-axis
@@ -29,7 +27,7 @@ class Learner:
         self.list_margins = np.array([])
 
     def reset(self):
-        self.__init__(self.lamb, self.secondary, self.users, self.n_arms, self.class_indexes)
+        self.__init__(self.lamb, self.secondary, self.users, self.n_arms)
 
     def act(self):
         # select the next arm to be pulled

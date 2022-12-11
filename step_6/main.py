@@ -1,8 +1,7 @@
 from simulator import *
-from users import *
 from website_simulation import *
 from UCB_SW_algorithm import *
-from Environment.NS_Environment import *
+from NS_environment import *
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as npr
@@ -18,6 +17,7 @@ numbers_of_products = data["product"]["numbers_of_products"]
 classes = data["users"]["classes"]
 users_classes = len(classes)
 
+
 # Random conversion rate (demand curve) generating number between [0, 1)
 # one matrix simulating a class of users subjected to abrupt changes
 demand_curve = npr.rand(5, 4)
@@ -29,20 +29,19 @@ swucb_single_reward = []
 ucb_single_reward = []
 window_size = int(np.sqrt(horizon))
 
-regret_ucb = np.zeros((n_experiments, horizon))
 
 for e in range(0, n_experiments):
-    print("Iteration no: ", e)
+    print(e)
     # set the UCB1 env
-    ucb_env = NS_Environment(n_arms, demand_curve, horizon)
+    sw_env = NS_environment(n_arms, demand_curve, horizon)
     ucb_learner = UCB_algorithm(n_arms)
     # set the Sliding Window UCB1 env
-    swucb_env = NS_Environment(n_arms, demand_curve, horizon)
+    swucb_env = NS_environment(n_arms, demand_curve, horizon)
     swucb_learner = UCB_SW_algorithm(n_arms, window_size)
 
     for t in range(0, horizon):
         pulled_arm = ucb_learner.pull_arm()
-        reward = ucb_env.round(pulled_arm)
+        reward = sw_env.round(pulled_arm)
         ucb_learner.update(pulled_arm, reward)
 
         pulled_arm = swucb_learner.pull_arm()
@@ -100,18 +99,17 @@ if wanna_simulate:
 
     # DEFINE 3 CLASS OF USERS
     classes_idx = [i for i in range(users_classes)]
-    total_users, alpha_ratios, graph, n_items_bought, demand_curve, features = user_distribution(classes_idx)
-
-    users = [Users_group(total_users[i], alpha_ratios[i], graph[i], n_items_bought[i], demand_curve[i], features[i])
-             for i in range(users_classes)]
+    users = get_users(classes_idx)
     # TODO: maybe run the sim just once for a class with new demand curve,
     # instead of 3 times with the same curve
+
+
 
     max_item_bought = data["simulator"]["max_item_bought"]
 
     # Plot distributions
-    plot_simulator(margins, prices, secondary)
-    plot_users(total_users, alpha_ratios, graph, n_items_bought, max_item_bought, demand_curve, classes_idx)
+    plot_simulator(sim)
+    plot_users(users, classes_idx)
 
     # RUN the simulation
     days = data["simulator"]["days"]

@@ -34,18 +34,17 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     return best_margin_for_unit, clairvoyant_margin_values
 
 
-def find_clairvoyant_reward(learner, clairvoyant_price_index):
+def find_clairvoyant_reward(learner, clairvoyant_price_index, iterations):
     x_labels = learner.list_prices
     margin = learner.list_margins
 
     x_values = [i for i in range(x_labels.shape[0])]
 
-    # TODO : clairvoyant solution
-    # a first attempt and reported below is to simply simulate with the best price setting of clairvoyant
-    y_clairvoyant = np.sum(learner.simulate(clairvoyant_price_index))
-    # a second attempt could be to use a different simulator (for example by setting it to the higher possbile n_boughts)
-    # but i have doubt about how to handle the graph secondaries, and alpha ratios, ...
-    # NOTE : running the algorithm for 1000 or more iterations shows the limit of this clairvoyant solution
+    # TODO review
+    y_clairvoyant = 0
+    for i in range(iterations):
+        reward = np.sum(learner.simulate(clairvoyant_price_index))
+        y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)
 
     fig = plt.figure(1, figsize=(70, 12))
     plt.plot(x_values, margin)

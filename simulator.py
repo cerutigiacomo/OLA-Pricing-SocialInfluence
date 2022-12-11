@@ -31,6 +31,13 @@ class Simulator:
 
         # bernoullli launch with probability of the user class conversion rate
         conversion_factor = bernoulli.rvs(user_class.conv_rates[j][self.prices_index[j]], size=1)
+
+        # she/he buys a number of units of the primary product if the price of
+        # a single unit is under the user’ reservation price; in other words,
+        # the users’ reservation price is not over the cumulative price of
+        # the multiple units, but only over the single unit
+        if user_class.reservation_price < self.prices[j]:
+            conversion_factor = 0
         items = user_class.get_n_items_to_buy(j)
         rewards[j] = self.margins[j] * \
                      items * \
