@@ -1,6 +1,6 @@
 import numpy as np
 
-class Observer:
+class Learner:
 
     def __init__(self, n_arms):
         self.n_arms = n_arms
@@ -13,3 +13,4 @@ class Observer:
         self.rewards_per_arm[pulled_arm].append(reward)
         self.pulled_arms = np.append(self.pulled_arms, float(pulled_arm))
         self.total_rewards = np.append(self.total_rewards, reward)
+        #print("Pulled arm:",pulled_arm,"Rewards:", self.rewards_per_arm[pulled_arm])

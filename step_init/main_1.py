@@ -21,9 +21,10 @@ def simple_run():
 # DEFINE THE SIMULATOR
 prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
+# last value is prices_index
 sim = Simulator(prices, margins, lamb, secondary, [today for _ in range(5)])
 
-# DEFINE 3 CLASS OF USERS
+# DEFINE 3 CLASS OF USERS [0,1,2]
 classes_idx = [i for i in range(users_classes)]
 users = get_users(classes_idx)
 

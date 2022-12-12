@@ -1,7 +1,9 @@
 from simulator import *
+from users import *
 from website_simulation import *
 from UCB_SW_algorithm import *
-from NS_environment import *
+from Environment.NS_Environment import *
+from resources.define_distribution import *
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as npr
@@ -17,52 +19,83 @@ numbers_of_products = data["product"]["numbers_of_products"]
 classes = data["users"]["classes"]
 users_classes = len(classes)
 
+classes_idx = [0]
+conv_rates = np.zeros((len(classes_idx), numbers_of_products, different_value_of_prices))
+for i in range(len(classes_idx)):
+    min_demand = classes[classes_idx[i]]["demand"]["min_demand"]
+    max_demand = classes[classes_idx[i]]["demand"]["max_demand"]
+    # Define a maximum value of conversion rates for every user class
+    conv_rates[i] = npr.uniform(min_demand, max_demand, (numbers_of_products, different_value_of_prices))
+#print ("INITIAL CONV_RATES:", conv_rates)
 
 # Random conversion rate (demand curve) generating number between [0, 1)
 # one matrix simulating a class of users subjected to abrupt changes
-demand_curve = npr.rand(5, 4)
+changed_conv_rates = np.array( [[0.943, 0.125, 0.765, 0.999],
+                      [0.123, 0.224, 0.934, 0.234],
+                      [0.234, 0.987, 0.893, 0.677],
+                      [0.321, 0.876, 0.765, 0.123],
+                      [0.321, 0.234, 0.013, 0.876]] )
 
-horizon = 350
-n_experiments = 30
+print ("INITIAL CONV_RATES:", conv_rates[0], "\n RANDOM CONV RATES:", changed_conv_rates)
+
+
+horizon = 300
+n_experiments = 200
 # single: per every single experiment
 swucb_single_reward = []
 ucb_single_reward = []
 window_size = int(np.sqrt(horizon))
 
+users = get_users([0])
+user = users[0]
+alpha = user.alpha
+# item to choose where simulate the UCB/SW_UCB algorithm
+product = 0
 
 for e in range(0, n_experiments):
     print(e)
     # set the UCB1 env
-    sw_env = NS_environment(n_arms, demand_curve, horizon)
+    sw_env = NS_Environment(n_arms, changed_conv_rates, horizon)
     ucb_learner = UCB_algorithm(n_arms)
     # set the Sliding Window UCB1 env
-    swucb_env = NS_environment(n_arms, demand_curve, horizon)
+    swucb_env = NS_Environment(n_arms, changed_conv_rates, horizon)
     swucb_learner = UCB_SW_algorithm(n_arms, window_size)
 
     for t in range(0, horizon):
         pulled_arm = ucb_learner.pull_arm()
-        reward = sw_env.round(pulled_arm)
+        print ("PULLED ARM:", pulled_arm)
+        # Bernoulli result of pulled arm
+        result = sw_env.round(pulled_arm)
+        reward = ucb_learner.simulation(product, user, changed_conv_rates, result)
+        print("Reward UCB (step no.", e,")", reward)
         ucb_learner.update(pulled_arm, reward)
 
         pulled_arm = swucb_learner.pull_arm()
-        reward = swucb_env.round(pulled_arm)
+        result = swucb_env.round(pulled_arm)
+        reward = swucb_learner.simulation(product,user,changed_conv_rates, result)
+        print("Reward SW (step no.", e,")", reward)
         swucb_learner.update(pulled_arm, reward)
+        print("------------------------------")
 
     ucb_single_reward.append(ucb_learner.total_rewards)
     swucb_single_reward.append(swucb_learner.total_rewards)
 
+    if e == 100:
+        print("ABRUPT CHANGE !!!")
+        conv_rates[0] = changed_conv_rates
+
 ucb_instantaneus_regret = np.zeros(horizon)
 swucb_instantaneus_regret = np.zeros(horizon)
-n_phases = len(demand_curve)
+n_phases = len(changed_conv_rates)
 phases_len = int(horizon / n_phases)
-optimal_per_phases = demand_curve.max(axis=1)
+optimal_per_phases = changed_conv_rates.max(axis=1)
 
-print("Abrupt changes produces this probabilities:\n", demand_curve)
+print("Abrupt changes produces this probabilities:\n", changed_conv_rates)
 print("Optimal per phases:\n", optimal_per_phases)
-optimal_per_round = np.zeros(horizon)
+opt_per_round = np.zeros(horizon)
 
 for i in range(0, n_phases):
-    optimal_per_round[i * phases_len: (i + 1) * phases_len] = optimal_per_phases[i]
+    opt_per_round[i * phases_len: (i + 1) * phases_len] = optimal_per_phases[i]
     ucb_instantaneus_regret[i * phases_len: (i + 1) * phases_len] = optimal_per_phases[i] - np.mean(ucb_single_reward, axis=0)[i * phases_len: (i + 1) * phases_len]
     swucb_instantaneus_regret[i * phases_len: (i + 1) * phases_len] = optimal_per_phases[i] - np.mean(swucb_single_reward, axis=0)[i * phases_len: (i + 1) * phases_len]
 
@@ -89,7 +122,7 @@ plt.legend(['UCB1','SW-UCB1'])
 plt.show()
 
 # Boolean to start the simulation and plot the graphs
-wanna_simulate = True
+wanna_simulate = False
 
 if wanna_simulate:
     # DEFINE THE SIMULATOR
