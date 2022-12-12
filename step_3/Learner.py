@@ -2,7 +2,7 @@ from simulator import Simulator
 from website_simulation import *
 
 
-debug = True
+debug = False
 
 class Learner:
     def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products, ):
@@ -10,6 +10,7 @@ class Learner:
         self.secondary = secondary
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
+        self.users_classes = users_classes
         self.users = get_users(users_classes)
 
         self.t = 1
