@@ -8,7 +8,7 @@ numbers_of_products = data["product"]["numbers_of_products"]
 days_simulation = data["simulator"]["days"]
 
 
-def website_simulation(sim, users):
+def website_simulation(sim, users, reduce_computation = 1):
     # This method simulates users visiting the ecommerce website
     # returns total rewards for all five products
     total_rewards = np.zeros(5, np.float16)
@@ -18,7 +18,7 @@ def website_simulation(sim, users):
 
     for user_class in users:
         index = users.index(user_class)
-        reward, product_visited[index], items_bought[index], items_rewards[index] = run_for_alpha_ratio(user_class, sim)
+        reward, product_visited[index], items_bought[index], items_rewards[index] = run_for_alpha_ratio(user_class, sim, reduce_computation)
         total_rewards += reward
 
     return total_rewards, product_visited, items_bought, items_rewards
@@ -49,7 +49,7 @@ We use the Alpha ratio and the total number of users. for iterating on the singl
 """
 
 
-def run_for_alpha_ratio(user_class, sim):
+def run_for_alpha_ratio(user_class, sim, reduce_computation):
     rewards_count = []
     product_visited = []
     items_bought = []
@@ -60,7 +60,7 @@ def run_for_alpha_ratio(user_class, sim):
         # i = 0 is the competitor
         if i == 0:
             continue
-        for j in range(int(alpha[i] * user_class.total_users)):
+        for j in range(int(alpha[i] * user_class.total_users * reduce_computation)):
             sim.reset()
             rewards = sim.simulation(i - 1, user_class)
 

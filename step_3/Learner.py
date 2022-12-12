@@ -1,7 +1,7 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = True
+debug = False
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
@@ -35,7 +35,9 @@ class Learner:
         self.secondary = secondary
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
-        self.users = get_users(user_classes)
+        
+        self.users_classes = users_classes
+        self.users = get_users(users_classes)
 
         self.t = 1
         self.prices_index = np.array([0 for i in range(n_products)])

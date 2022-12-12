@@ -109,3 +109,87 @@ def find_max_rewards(usr, scdy):
     best_reward = np.sum(reward_considering_secondary * n_users_on_products)
 
     return best_reward
+    
+    
+# users = get_users([0])
+# TODO : using Student user for test purposes
+# user = users[0]
+# used below and passed as parameter to ucblearner
+max_reward = find_max_rewards(users[0], secondary)
+
+# TODO : WORKING TEST does not works properly
+# è troppo top reward per una simulazione aleatoria reale
+max_reward = max_reward/10
+
+
+
+
+######### UCB
+# TODO 
+the learner more times and get the mean of the results
+
+learner = UCBLearner(lamb, secondary, [0], 4, max_reward)
+
+iteration = 30
+daily_interaction = 30
+
+#final_reward= np.zeros(iteration)
+#cumulative_regret = np.zeros(iteration)
+#cumulative_reward = np.zeros(iteration)
+
+env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], [0])
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
+
+# Clairvoyant solution
+y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
+
+# Plot UCB Regret and Reward
+clairvoyant_margin = y_clairvoyant
+clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin)
+cumulative_reward = np.cumsum(learner.list_margins)
+cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - cumulative_reward
+final_reward = learner.list_margins
+
+plot_regret_reward(cumulative_regret,
+                   cumulative_reward,
+                   final_reward,
+                   clairvoyant_margin,
+                   label_alg= "Step3UCB",
+                   day = iteration)
+
+
+# show arms confidence
+def scale_min_max(means):
+    #max_value = np.max(means.flatten())
+    max_value = max_reward
+    min_value = np.min(means.flatten())
+    x_scaled = (means - min_value) / (max_value - min_value)
+    return x_scaled
+
+def enumerate_price_products(rewards,widths):
+    pp = []
+    # TODO : scaled versions is an attempt solution for the expected reward problem
+    # trple of values (product,price,expected_reward_SCALED,confidence)
+    for i in range(0,numbers_of_products):
+        for j in range(0,learner.n_arms):
+            pp.append((i,j,rewards[i,j],widths[i,j]))
+    return pp
+
+
+#rewards = scale_min_max(learner.means)
+rewards = learner.means
+widths = learner.widths
+pp = enumerate_price_products(rewards,widths)
+
+fig2 = plt.figure(2,figsize=(30,10))
+x_values = np.arange(len(pp))
+colors = ["r","g","b","y","m"]
+for x in x_values:
+    plt.scatter(x,pp[x][2],color=colors[pp[x][0]])
+    #plt.vlines(x=x,ymin=pp[x][2]-pp[x][3],ymax=pp[x][2]+pp[x][3],colors=colors[pp[x][0]])
+    plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]],capsize=3)
+plt.xticks(x_values)
+plt.ylim(-2, 3)
+plt.grid()
+plt.show()
+
