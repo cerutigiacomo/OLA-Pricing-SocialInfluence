@@ -1,80 +1,78 @@
 from Learner import *
+from step_3.Learner import update_step_parameters_of_simulation
+from step_3.sample_values import *
 
 
 class UCBLearner(Learner):
 
-    def __init__(self, lamb, secondary, users, n_prices, top_reward=None, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products):
         super().__init__(lamb, secondary, users, n_prices, n_products)
 
-        # TODO : testing best reward given the observability of step3's variables
-        self.top_reward = top_reward
-
-        # upper confidence bounds of arms
-        # optimistic estimation of the rewards provided by arms
+        # upper confidence bounds of arms : media è il conv rate
+        # optimistic estimation of the conv rate provided by arms
         self.means = np.zeros(shape=(self.n_products, self.n_arms))
         self.arm_counters = np.zeros(shape=(self.n_products, self.n_arms))
         self.widths = np.array([[np.inf for _ in range(self.n_arms)] for i in range(self.n_products)])
 
+        # attributes for simulation of expectations on reward
+        self.expected_rewards = np.zeros(shape=(self.n_products, self.n_arms))
+
     def act(self):
-        # CONV RATES UNKNOWN SOLUTION
-        return np.argmax(self.means + self.widths, axis=1)
+        # arms pulled for each product
+        # [0 0 0 0 0]
+        # [1 1 1 1 1]
+        # ...
+        # [3 3 3 3 3]
 
-        def scale_min_max():
-            # max_value = np.max(self.means.flatten())
-            max_value = self.top_reward
-            min_value = np.min(self.means.flatten())
-            if self.t > 0 and max_value != min_value:
-                x_scaled = (self.means - min_value) / (max_value - min_value)
-            else:
-                x_scaled = self.means
-            return x_scaled
+        # reward matrix
+        # 00 01 02 03
+        # 10 11 12 13
+        # ...
+        # 40 41 42 43
+        # TODO : review solution, improve by adding accuracy ?
+        # BUT this is just a sample, i.e. running the simulation for N rounds would return an accurate expectation value
 
-        scaled_means = scale_min_max()
+        for _ in range(1,11):
+            for arm_id in range(self.n_arms):
+                simulated_super_arm = np.array([arm_id for _ in range(self.n_products)])
+                # self.sim.prices, self.sim.margins ? TODO ? !!!
+                self.sim.prices_index = simulated_super_arm
+                reward, *_ = website_simulation(self.sim, self.users)
+                self.expected_rewards[np.arange(self.n_products), simulated_super_arm] += reward
+
+        self.expected_rewards = self.expected_rewards/10
+
         if debug:
-            print("SCALED MEANS : \n", scaled_means)
-            print("SCALED CONFIDENCE ON REWARDS : \n", scaled_means + self.widths)
-        return np.argmax(scaled_means + self.widths, axis=1)
+            print("Expected rewards : \n", self.expected_rewards)
+
+        new_arm_indexes_to_be_pulled_next_day = np.argmax(self.expected_rewards, axis=1)
+
+        return new_arm_indexes_to_be_pulled_next_day
 
     def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
-        # MAIN UPDATE FOR RESULTS PRESENTATION
+        # method for updates of daily observations result
+
+        # main update for result presentation
         super().update(price_pulled, reward, None, None, None)
 
         if debug:
             print("PRICE PULLED : \n", price_pulled)
             print("REWARD OBSERVED : \n", reward)
 
-        sample_conv_rates = np.full_like(np.array([]), fill_value=0, shape=self.n_products)
-        counters = np.zeros(shape=self.n_products)
-        for (i, (visited_i, bought_i, rewards_i)) in enumerate(
-                zip(product_visited[0], items_bought[0], items_rewards[0])):
-            seen = np.zeros(shape=numbers_of_products)
-            seen[visited_i] += 1
-            bought = np.zeros(shape=numbers_of_products)
-            bought[bought_i > 0.0] += 1
-            counters += seen
-            mask_seen = seen > 0
-            sample_conv_rates[mask_seen] = \
-                (sample_conv_rates[mask_seen] * (counters[mask_seen] - 1) + (bought[mask_seen] / seen[mask_seen])) \
-                / counters[mask_seen]
-            # sample_conv_rates[np.isnan(sample_conv_rates)] = 0
+        # estimate sample values from daily observation result
+        # 1 conversion rate
+        sample_conv_rates = compute_sample_conv_rate(product_visited, items_bought)
+        # ... TODO: how to manage bounds on other values ? or just use the means for alpha, n_bought, ...
 
-        # update confidence bounds
+        # update of confidence bounds
 
         # update means
         past_averages = self.means[np.arange(0, self.n_products), price_pulled]
         len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
-        # self.means[np.arange(0, self.n_products), price_pulled] = ((past_averages * len_averages) + reward) / (len_averages + 1)
         self.means[np.arange(0, self.n_products), price_pulled] = \
             ((past_averages * len_averages) + sample_conv_rates) / (len_averages + 1)
 
-        # update counter of selected arms
-        mask_positive_rewards = np.array([True if x > 0.0 else False for x in reward])
-        for product_id in range(numbers_of_products):
-            if mask_positive_rewards[product_id]:
-                self.arm_counters[product_id, price_pulled[product_id]] += 1
-        # update counter of every arm, included the one with observed reward equal 0
-        # self.arm_counters[np.arange(0,number_of_products), price_pulled] += 1
-
+        # update upper bounds, arm counters of previous day
         for product in range(self.n_products):
             for idx in range(self.n_arms):
                 if self.arm_counters[product, idx] > 0:
@@ -82,10 +80,23 @@ class UCBLearner(Learner):
                 else:
                     self.widths[product, idx] = np.inf
 
+        # update counters
+        self.arm_counters[np.arange(0, self.n_products), price_pulled] += 1
+
+    def update_step_parameters(self, product_visited, items_bought, n_step=3):
+        estimated_conv_rate = self.estimate_conversion_rates()
+        estimated_conv_rate = np.clip(estimated_conv_rate, a_min=0, a_max=1)
+        self.users = \
+            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought, n_step)
+
+    def estimate_conversion_rates(self):
+        return self.means + self.widths
+        #return np.clip(self.means + self.widths, a_min=0, a_max=1)
+
     def debug(self):
         if debug:
             print("LEARNER BOUNDS ...")
             print("means : \n", self.means)
             print("arms counter : \n", self.arm_counters)
             print("widths : \n", self.widths)
-            print("confidence : \n", self.means + self.widths)
+            print("estimated conversion rates : \n", self.estimate_conversion_rates())
