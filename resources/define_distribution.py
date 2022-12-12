@@ -169,3 +169,9 @@ def get_all_margins():
     for j in range(4):
         margin[j] = np.array([data_[i]["price"][j] - data_[i]["cost"] for i in range(5)])
     return margin.transpose()
+
+
+def get_scaled_reward(reward, price_pulled):
+    p, margin = get_prices_and_margins(price_pulled)
+
+    return margin

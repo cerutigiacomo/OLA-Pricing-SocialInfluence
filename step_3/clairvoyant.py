@@ -46,12 +46,18 @@ def find_clairvoyant_reward(learner, env, clairvoyant_price_index, iterations):
         reward, product_visited, items_bought, items_rewards = env.round(clairvoyant_price_index)
         reward = np.sum(reward)
         y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)
+    # y_clairvoyant = mean of the reward of the clairvoyant
+    if plot:
+        x_labels = learner.list_prices
+        margin = learner.list_margins
 
-    fig = plt.figure(1, figsize=(70, 12))
-    plt.plot(x_values, margin)
-    plt.xticks(ticks=x_values, labels=x_labels, rotation=90)
-    plt.plot(x_values, np.repeat(y_clairvoyant, len(x_values)), "r-")
-    plt.grid()
-    plt.show()
+        x_values = [i for i in range(x_labels.shape[0])]
+
+        fig = plt.figure(1, figsize=(70, 12))
+        plt.plot(x_values, margin)
+        plt.xticks(ticks=x_values, labels=x_labels, rotation=90)
+        plt.plot(x_values, np.repeat(y_clairvoyant, len(x_values)), "r-")
+        plt.grid()
+        plt.show()
 
     return y_clairvoyant
