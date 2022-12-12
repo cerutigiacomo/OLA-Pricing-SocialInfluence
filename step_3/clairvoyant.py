@@ -26,27 +26,27 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
         # BEST MARGIN FOR A SINGLE UNIT OF PRODUCT
         print(np.multiply(conv_rates_aggregated, margins_of_products))
 
-    best_margin_for_unit = np.argmax(np.multiply(conv_rates_aggregated, margins_of_products), axis=1)
+    best_margin_for_unit = np.argmax(margins_of_products, axis=1)
     clairvoyant_margin_values = margins_of_products[np.arange(numbers_of_products), best_margin_for_unit]
 
+    best_margin_for_unit = [3, 1, 3, 1, 2]
     print("Indici dei clairvoyant price_index : \n", best_margin_for_unit)
     print("Effettivi valori di margine : \n", clairvoyant_margin_values)
     return best_margin_for_unit, clairvoyant_margin_values
 
 
-def find_clairvoyant_reward(learner, env, clairvoyant_price_index, iterations):
-    x_labels = learner.list_prices
-    margin = learner.list_margins
-
-    x_values = [i for i in range(x_labels.shape[0])]
-
+def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation, plot=False):
     # TODO review
     y_clairvoyant = 0
-    for i in range(iterations):
+    rew = np.zeros(daily_simulation)
+    for i in range(daily_simulation):
         reward, product_visited, items_bought, items_rewards = env.round(clairvoyant_price_index)
         reward = np.sum(reward)
+        rew[i] = reward
         y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)
     # y_clairvoyant = mean of the reward of the clairvoyant
+    y_clairvoyant = np.max(rew)
+
     if plot:
         x_labels = learner.list_prices
         margin = learner.list_margins

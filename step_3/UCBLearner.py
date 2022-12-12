@@ -3,12 +3,12 @@ from Learner import *
 
 class UCBLearner(Learner):
 
-    def __init__(self, lamb, secondary, users, n_prices, top_reward=None, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users, n_prices, step ,top_reward=None, n_products=numbers_of_products):
         super().__init__(lamb, secondary, users, n_prices, n_products)
 
         # TODO : testing best reward given the observability of step3's variables
         self.top_reward = top_reward
-
+        self.step = step
         # upper confidence bounds of arms
         # optimistic estimation of the rewards provided by arms
         self.means = np.zeros(shape=(self.n_products, self.n_arms))
@@ -82,6 +82,11 @@ class UCBLearner(Learner):
                 else:
                     self.widths[product, idx] = np.inf
 
+    def update_pulled_and_success(self, pulled_arm, visited, n_bought_products, items_rewards):
+        #Need to be implemented ?
+        return 0
+
+
     def debug(self):
         if debug:
             print("LEARNER BOUNDS ...")
@@ -89,3 +94,40 @@ class UCBLearner(Learner):
             print("arms counter : \n", self.arm_counters)
             print("widths : \n", self.widths)
             print("confidence : \n", self.means + self.widths)
+
+    def update_step(self, a):
+        if self.step == 3:
+            for i in range(len(users_classes)):
+                self.learner.users[i].conv_rates = a
+        if self.step == 4:
+            for i in range(len(users_classes)):
+                self.learner.users[i].alpha = a
+
+        """
+        00000 -> 10
+        10000 -> 15
+        20000 -> 20
+        ...
+        01000 -> 11
+        02000 -> 16
+        03000 -> 21
+        ...
+        00001 -> 12
+        00002 -> 17
+        00003 -> 22
+        
+        """
+
+        rew = np.zeros((numbers_of_products, different_value_of_prices))
+        for prod in range(numbers_of_products):
+            for arm in range(self.n_arms):
+                index_prices = np.zeros(numbers_of_products)
+                index_prices[prod] = arm
+                rew[prod] = self.simulate(index_prices)[prod]
+
+
+    def simulate(self, price_pulled):
+        self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
+        self.sim.prices_index = price_pulled
+        observed_reward, a, b, c = website_simulation(self.sim, self.users)
+        return observed_reward

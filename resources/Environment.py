@@ -4,7 +4,7 @@ from website_simulation import *
 class Environment:
     def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users):
         self.n_arms = n_prices
-        self.users = users
+        self.users = get_users(users)
         self.sim = Simulator(prices, margins, lamb, secondary, prices_index)
         self.lam = lamb
 

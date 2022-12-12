@@ -69,14 +69,15 @@ max_reward = max_reward/10
 
 learner = UCBLearner(lamb, secondary, [0], 4, max_reward)
 
-iteration = 300
+iteration = 30
+daily_interaction = 30
 
 #final_reward= np.zeros(iteration)
 #cumulative_regret = np.zeros(iteration)
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], [0])
-iterate(learner, env, iteration, clairvoyant_price_index, "step3UCB")
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
 
 # Clairvoyant solution
 y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
