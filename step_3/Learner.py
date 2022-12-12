@@ -1,15 +1,41 @@
 from simulator import Simulator
 from website_simulation import *
 
-
 debug = False
 
+
+def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
+    match n_step:
+        case 3:
+            # STEP 3
+            # unknown : conversion rates
+            # known : alpha ratios, number of items bought, graph weights
+
+            for user in users:
+                user.conv_rates = estimated_conv_rates
+                # STEP 4-5
+                # edit n_bought to a fixed maximum ?
+                # user.alpha = compute_sample_alpha_ratios()
+                # edit alpha ratios
+                # edit graph weights
+
+            return users
+
+        case 4:
+            pass
+        case 5:
+            pass
+        case _:
+            raise ValueError()
+
+
 class Learner:
-    def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products, ):
+    def __init__(self, lamb, secondary, user_classes, n_prices, n_products=numbers_of_products):
         self.lamb = lamb
         self.secondary = secondary
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
+        
         self.users_classes = users_classes
         self.users = get_users(users_classes)
 
@@ -41,3 +67,6 @@ class Learner:
         self.prices_index = price_pulled
         self.list_prices = np.append(self.list_prices, str(self.prices_index))
         self.list_margins = np.append(self.list_margins, np.sum(reward))
+
+    def update_step_parameters(self, product_visited, items_bought, n_step):
+        pass
