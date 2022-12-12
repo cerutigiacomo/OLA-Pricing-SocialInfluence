@@ -55,8 +55,8 @@ class TSLearner(Learner):
                     if a == 0:
                         # do not consider the old value since it is 0
                         a = 1
-                    if (a * (counters[j] - 1) + (bought[j]) / seen[j]) / (counters[j]) == a and a != 1:
-                        print("ERROR: new conv_rate is 0\n\n")
+                    #if (a * (counters[j] - 1) + (bought[j]) / seen[j]) / (counters[j]) == a and a != 1:
+                    #   print("ERROR: new conv_rate is 0\n\n")
                     estimed_conv_rate[j][pulled_arm[j]] = (a * (counters[j] - 1) + (bought[j]) / seen[j]) \
                                                           / (counters[j])
 

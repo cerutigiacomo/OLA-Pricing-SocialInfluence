@@ -12,7 +12,11 @@ def update_step_parameters_of_simulation(users, estimated_conv_rates, product_vi
             # known : alpha ratios, number of items bought, graph weights
 
             for user in users:
-                user.conv_rates = estimated_conv_rates
+                for prod in range(numbers_of_products):
+                    for arm in range(different_value_of_prices):
+                        if estimated_conv_rates[prod,arm] != 0.0 :
+                            user.conv_rates[prod,arm] = estimated_conv_rates[prod,arm]
+
                 # STEP 4-5
                 # edit n_bought to a fixed maximum ?
                 # user.alpha = compute_sample_alpha_ratios()
@@ -35,7 +39,7 @@ class Learner:
         self.secondary = secondary
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
-        
+
         self.users_classes = users_classes_to_import
         self.users = get_users(users_classes_to_import)
 

@@ -33,6 +33,9 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 # TODO iterate the learner more times and get the mean of the results
 
 learner = UCBLearner(lamb, secondary, [0], 4)
+# conversion_rates not observable, then the learner will estimate them.
+for i in range(len(class_choosed)):
+    learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
 iteration = 30
 daily_interaction = 30
@@ -42,24 +45,13 @@ daily_interaction = 30
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
-
-# Clairvoyant solution
-y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
-
-# Plot UCB Regret and Reward
-clairvoyant_margin = y_clairvoyant
-clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin)
-cumulative_reward = np.cumsum(learner.list_margins)
-cumulative_regret = np.cumsum(clairvoyant_margin_iterated) - cumulative_reward
-final_reward = learner.list_margins
-
-plot_regret_reward(cumulative_regret,
-                   cumulative_reward,
-                   final_reward,
-                   clairvoyant_margin,
-                   label_alg= "Step3UCB",
-                   day = iteration)
+#iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
+for y in range(100):
+    #learner.debug()
+    price_pulled = learner.act()
+    reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
+    learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
+    learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
 
 rewards = learner.means
 widths = learner.widths
