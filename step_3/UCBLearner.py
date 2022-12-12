@@ -1,6 +1,4 @@
 from Learner import *
-from step_3.Learner import update_step_parameters_of_simulation
-from step_3.sample_values import *
 
 
 class UCBLearner(Learner):
@@ -18,19 +16,6 @@ class UCBLearner(Learner):
         self.expected_rewards = np.zeros(shape=(self.n_products, self.n_arms))
 
     def act(self):
-        # arms pulled for each product
-        # [0 0 0 0 0]
-        # [1 1 1 1 1]
-        # ...
-        # [3 3 3 3 3]
-
-        # reward matrix
-        # 00 01 02 03
-        # 10 11 12 13
-        # ...
-        # 40 41 42 43
-        # TODO : review solution, improve by adding accuracy ?
-        # BUT this is just a sample, i.e. running the simulation for N rounds would return an accurate expectation value
 
         for arm_id in range(self.n_arms):
             simulated_super_arm = np.array([arm_id for _ in range(self.n_products)])
@@ -89,8 +74,8 @@ class UCBLearner(Learner):
     def estimate_conversion_rates(self):
         return self.means + self.widths
         #return np.clip(self.means + self.widths, a_min=0, a_max=1)
-        
-        
+
+
     def update_pulled_and_success(self, pulled_arm, visited, n_bought_products, items_rewards):
         #Need to be implemented ?
         return 0
