@@ -1,15 +1,16 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = False
+
+debug = True
 
 class Learner:
-    def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products, ):
+    def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products, ):
         self.lamb = lamb
         self.secondary = secondary
         # data disaggregation is going to be set before this function
-        # users would contain a unique Users_group object of aggregated data
-        self.users = users
+        # Users are reloaded since we could change the properties.
+        self.users = get_users(users_classes)
 
         self.t = 1
         self.prices_index = np.array([0 for i in range(n_products)])
@@ -33,7 +34,7 @@ class Learner:
         # select the next arm to be pulled
         pass
 
-    def update(self, price_pulled, reward):
+    def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
         # update observation list once reward is returned
         self.t += 1
         self.prices_index = price_pulled

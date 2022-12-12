@@ -1,5 +1,7 @@
 from plotting.plot_reward_regret import *
 from clairvoyant import *
+from resources.Environment import Environment
+from step_3.iterate_env import iterate
 
 f = open('../resources/environment.json')
 data = json.load(f)
@@ -49,11 +51,11 @@ def find_max_rewards(usr, scdy):
     return best_reward
 
 
-users = get_users([0])
+# users = get_users([0])
 # TODO : using Student user for test purposes
-user = users[0]
+# user = users[0]
 # used below and passed as parameter to ucblearner
-max_reward = find_max_rewards(user,secondary)
+max_reward = find_max_rewards(users[0], secondary)
 
 # TODO : WORKING TEST does not works properly
 # è troppo top reward per una simulazione aleatoria reale
@@ -65,22 +67,19 @@ max_reward = max_reward/10
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-learner = UCBLearner(lamb, secondary, users, 4, max_reward)
+learner = UCBLearner(lamb, secondary, [0], 4, max_reward)
 
-iteration = 1000
+iteration = 300
 
-final_reward= np.zeros(iteration)
-cumulative_regret = np.zeros(iteration)
-cumulative_reward = np.zeros(iteration)
+#final_reward= np.zeros(iteration)
+#cumulative_regret = np.zeros(iteration)
+#cumulative_reward = np.zeros(iteration)
 
-for iterations in range(iteration):
-    learner.debug()
-    price_pulled = learner.act()
-    reward_observed = learner.simulate(price_pulled)
-    learner.update(price_pulled, reward_observed)
+env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], [0])
+iterate(learner, env, iteration, clairvoyant_price_index, "step3UCB")
 
 # Clairvoyant solution
-y_clairvoyant = find_clairvoyant_reward(learner, clairvoyant_price_index, iteration)
+y_clairvoyant = find_clairvoyant_reward(learner, env, clairvoyant_price_index, iteration)
 
 # Plot UCB Regret and Reward
 clairvoyant_margin = y_clairvoyant
