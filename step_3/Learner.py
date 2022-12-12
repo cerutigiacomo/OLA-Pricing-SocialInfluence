@@ -1,7 +1,7 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = False
+debug = True
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
@@ -30,14 +30,14 @@ def update_step_parameters_of_simulation(users, estimated_conv_rates, product_vi
 
 
 class Learner:
-    def __init__(self, lamb, secondary, user_classes, n_prices, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users_classes_to_import, n_prices, n_products=numbers_of_products):
         self.lamb = lamb
         self.secondary = secondary
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
         
-        self.users_classes = users_classes
-        self.users = get_users(users_classes)
+        self.users_classes = users_classes_to_import
+        self.users = get_users(users_classes_to_import)
 
         self.t = 1
         self.prices_index = np.array([0 for i in range(n_products)])
@@ -55,7 +55,7 @@ class Learner:
         self.list_margins = np.array([])
 
     def reset(self):
-        self.__init__(self.lamb, self.secondary, self.users, self.n_arms)
+        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms)
 
     def act(self):
         # select the next arm to be pulled

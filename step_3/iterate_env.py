@@ -3,7 +3,7 @@ from plotting.plot_reward_regret import *
 
 
 mean_iteration = 5
-def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg):
+def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
 
     global price_pulled, reward_observed, product_visited, items_bought, items_rewards, clairvoyant_margin_values
 
@@ -22,16 +22,16 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
                 learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
             learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
 
-"""
-ucb
-
-
-                learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-                learner.update_step_parameters(product_visited, items_bought, n_step)
-                
-prima del mio update
-
-"""
+        """
+        ucb
+        
+        
+                        learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
+                        learner.update_step_parameters(product_visited, items_bought, n_step)
+                        
+        prima del mio update
+        
+        """
 
 
         clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)

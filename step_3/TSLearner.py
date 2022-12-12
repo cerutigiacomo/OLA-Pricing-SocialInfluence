@@ -59,12 +59,10 @@ class TSLearner(Learner):
                         print("ERROR: new conv_rate is 0\n\n")
                     estimed_conv_rate[j][pulled_arm[j]] = (a * (counters[j] - 1) + (bought[j]) / seen[j]) \
                                                           / (counters[j])
-            #print("estimed_conv_rate: \n", estimed_conv_rate)
 
             self.estimed_conv_rate = estimed_conv_rate
 
             self.update_users_conv_rates()
-        #self.users[0].conv_rates = estimed_conv_rate
 
     def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
         # MAIN UPDATE FOR RESULTS PRESENTATION
@@ -118,4 +116,4 @@ class TSLearner(Learner):
         for prod in range(self.n_products):
             for arm in range(self.n_arms):
                 if self.estimed_conv_rate[prod][arm] != 0:
-                    self.users[0].conv_rates[prod][arm] = (self.estimed_conv_rate[prod][arm] + self.users[0].conv_rates[prod][arm]) / 2
+                    self.users[0].conv_rates[prod][arm] = self.estimed_conv_rate[prod][arm]
