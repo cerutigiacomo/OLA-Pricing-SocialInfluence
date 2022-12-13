@@ -1,3 +1,5 @@
+import numpy as np
+
 from  resources.define_distribution import *
 
 def compute_sample_conv_rate(product_visited, items_bought):
@@ -46,9 +48,22 @@ def compute_sample_conv_rate(product_visited, items_bought):
     return sample_conv_rates
 
 
-def compute_sample_n_bought():
-    # TODO
-    pass
+def compute_sample_n_bought(items_visiteed, items_bought):
+    boughts_of_product = np.zeros(shape=numbers_of_products)
+    seen = np.zeros(shape=numbers_of_products)
+
+    for visited_by_class, bought_by_class in zip(items_visiteed, items_bought):
+        for visited_usr, bought_usr in zip(visited_by_class, bought_by_class):
+            seen[visited_usr] += 1
+            boughts_of_product += bought_usr
+
+    mean_bought = boughts_of_product / seen
+    #mean_bought = np.where(~np.isnan(mean_bought), mean_bought, 0)
+
+    return mean_bought
+
+
+
 
 
 def compute_sample_alpha_ratios():

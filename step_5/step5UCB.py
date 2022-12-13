@@ -16,6 +16,7 @@ f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 debug = False
+fixed_maximum = 15
 class_choosed = [0]
 
 prices, margins, secondary, today = simulator_distribution()
@@ -31,12 +32,14 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-learner = UCBLearner(lamb, secondary, [0], 4)
+learner = UCBLearner(lamb, secondary, [0], 4, step = 5)
 # conversion_rates not observable, then the learner will estimate them.
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
+    learner.users[i].alpha = npr.dirichlet(npr.random(numbers_of_products+1), 1).reshape(numbers_of_products + 1)
+    learner.users[i].max_item_bought = npr.random(1) * fixed_maximum
 
-iteration = 300
+iteration = 50
 daily_interaction = 30
 
 #final_reward= np.zeros(iteration)
@@ -44,7 +47,7 @@ daily_interaction = 30
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step4UCB")
 
 
 rewards = learner.means
