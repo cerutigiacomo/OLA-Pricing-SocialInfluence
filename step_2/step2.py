@@ -4,7 +4,7 @@ from resources.define_distribution import *
 from plot_greedy import *
 import json
 
-debug_print_distribution = True
+debug_print_distribution = False
 f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
@@ -14,7 +14,7 @@ max_item_bought = data["simulator"]["max_item_bought"]
 def clairvoyant_sol():
     conv_prices = (get_all_margins() * users[0].conv_rates)
     indexes = np.argmax(conv_prices, axis=1)
-    #a = [1, 0, 1, 1, 1]
+    indexes = [3, 3, 3, 2, 3]
     sim.prices, sim.margins = get_prices_and_margins(indexes)
     reward = np.zeros((5,5))
     for i in range(5):

@@ -1,21 +1,24 @@
-from Learner import *
+from Learner.Learner import *
 from step_3.sample_values import *
-import math
 
 
 class UCBLearner(Learner):
 
-    def __init__(self, lamb, secondary, users, n_prices, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users, n_prices, step=3, n_products=numbers_of_products):
         super().__init__(lamb, secondary, users, n_prices, n_products)
 
         # upper confidence bounds of arms : media è il conv rate
         # optimistic estimation of the conv rate provided by arms
+        self.step = step
         self.means = np.zeros(shape=(self.n_products, self.n_arms))
         self.arm_counters = np.zeros(shape=(self.n_products, self.n_arms))
         self.widths = np.array([[np.inf for _ in range(self.n_arms)] for i in range(self.n_products)])
 
         # attributes for simulation of expectations on reward
         self.expected_rewards = np.zeros(shape=(self.n_products, self.n_arms))
+
+    def reset(self):
+        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms, step = self.step)
 
     def act(self):
 
@@ -32,7 +35,8 @@ class UCBLearner(Learner):
         # TODO : clipping is wrong ?
         estimated_conv_rate = np.clip(estimated_conv_rate, a_min=0, a_max=1)
         self.users = \
-            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought, n_step=3)
+            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought,
+                                                 self.step)
 
     def estimate_conversion_rates(self):
         return self.means + self.widths

@@ -1,4 +1,4 @@
-from UCBLearner import *
+from step_3.UCBLearner import *
 
 debug = False
 

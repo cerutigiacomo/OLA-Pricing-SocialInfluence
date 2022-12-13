@@ -1,4 +1,4 @@
-from Learner import *
+from Learner.Learner import *
 
 reduction_factor = 0.3 # used to reduce the number of customer during the learner simulation for updating the means
 
@@ -26,7 +26,7 @@ class TSLearner(Learner):
         for prod in range(self.n_products):
             # generate beta for every price of the current product
             beta = npr.beta(self.beta_parameters[prod, :, 0], self.beta_parameters[prod, :, 1])
-            index[prod] = np.argmax(beta * (self.estimed_conv_rate[prod] * self.nearby_reward[prod] + self.nearby_reward[prod]))
+            index[prod] = np.argmax(beta * (self.estimed_conv_rate[prod] * self.nearby_reward[prod]))
         return index
 
     def update_pulled_and_success(self, pulled_arm, visited, n_bought_products, items_rewards):

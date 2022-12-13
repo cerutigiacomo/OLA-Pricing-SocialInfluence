@@ -1,4 +1,4 @@
-from clairvoyant import *
+from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 
 
