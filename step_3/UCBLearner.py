@@ -1,4 +1,4 @@
-from step_3.Learner import *
+from Learner.Learner import *
 from step_3.sample_values import *
 import math
 

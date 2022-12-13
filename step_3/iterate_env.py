@@ -1,4 +1,4 @@
-from step_3.clairvoyant import *
+from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 
 # 5 mean as the possible product to buy

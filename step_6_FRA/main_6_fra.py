@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as npr
 from plotting.plot_reward_regret import *
-from step_3.clairvoyant import *
+from Learner.clairvoyant import *
 from resources.Environment import Environment
 from iterate import iterate
 from UCBLearner import *
