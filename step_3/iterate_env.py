@@ -11,6 +11,8 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
     cumulative_regret = np.zeros((mean_iteration, iteration))
     final_reward = np.zeros((mean_iteration, iteration))
     for z in range(mean_iteration):
+        product_visited_list = []
+        items_bought_list = []
         print("plot ite: ", z)
         learner.reset()
 
@@ -18,8 +20,11 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
             learner.debug()
             price_pulled = learner.act()
             reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
+            product_visited_list += product_visited[0]
+            items_bought_list += items_bought[0]
             learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-            learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
+            learner.update_pulled_and_success(price_pulled,
+                                              product_visited_list, items_bought_list, items_rewards)
 
         """
         ucb

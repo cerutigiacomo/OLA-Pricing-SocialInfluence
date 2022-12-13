@@ -1,7 +1,7 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = True
+debug = False
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
@@ -28,7 +28,7 @@ def update_step_parameters_of_simulation(users, estimated_conv_rates, product_vi
             pass
         case 5:
             # STEP 5
-            users = update_users_graph_weights(users, product_visited, items_bought)
+            users = update_users_graph_weights(users, product_visited)
             pass
         case _:
             raise ValueError()
@@ -47,18 +47,22 @@ def update_users_alpha_ratios(users, product_visited):
     # TODO count all the numbers of items visited, not for just the actual simulation
     products_count = np.zeros(numbers_of_products+1)
     products_count[0] = 0.1
-    for element in product_visited[0]:
+    for element in product_visited:
         prod = element[0]
         products_count[prod+1] += 1
 
-    products_count[1:] = products_count[1:] / len(product_visited[0])
+    products_count[1:] = products_count[1:] / len(product_visited)
+
+    for i in range(numbers_of_products + 1):
+        if products_count[i] == 0:
+            products_count[i] = 0.001
 
     for user in users:
         user.alpha = npr.dirichlet(products_count, 1).reshape(numbers_of_products + 1)
     return users
 
 def update_users_max_bought(users, items_bought):
-    items_bought_arr = np.array(items_bought)[0]
+    items_bought_arr = np.array(items_bought)
 
     # TODO count all the numbers of items bought, not for just the actual simulation
     # We want to update the max_bought of the users
@@ -89,12 +93,12 @@ def update_users_max_bought(users, items_bought):
     return users
 
 
-def update_users_graph_weights(users, product_visited, items_bought):
+def update_users_graph_weights(users, product_visited):
     graph = np.zeros((numbers_of_products, numbers_of_products))
     # TODO count all the numbers of items visited, not for just the actual simulation
     products_count = np.zeros((numbers_of_products, numbers_of_products))
     products_count_view = np.zeros(numbers_of_products)
-    for element in product_visited[0]:
+    for element in product_visited:
         prod = element[0]
         products_count_view[prod] += 1
         for visited in element:

@@ -31,7 +31,8 @@ class UCBLearner(Learner):
 
         estimated_conv_rate = self.estimate_conversion_rates()
 
-        print("ESTIMATED CONV RATE FOR THE NEW USER : \n", estimated_conv_rate)
+        if debug:
+            print("ESTIMATED CONV RATE FOR THE NEW USER : \n", estimated_conv_rate)
         # TODO : clipping is wrong ?
         estimated_conv_rate = np.clip(estimated_conv_rate, a_min=0, a_max=1)
         self.users = \
