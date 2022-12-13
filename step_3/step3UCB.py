@@ -44,7 +44,7 @@ daily_interaction = 30
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
 
 
 rewards = learner.means

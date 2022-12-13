@@ -40,7 +40,7 @@ print ("INITIAL CONV_RATES:", conv_rates[0], "\n RANDOM CONV RATES:", changed_co
 
 
 horizon = 300
-n_experiments = 200
+n_experiments = 100
 # single: per every single experiment
 swucb_single_reward = []
 ucb_single_reward = []
@@ -80,7 +80,7 @@ for e in range(0, n_experiments):
     ucb_single_reward.append(ucb_learner.total_rewards)
     swucb_single_reward.append(swucb_learner.total_rewards)
 
-    if e == 100:
+    if e == 50:
         print("ABRUPT CHANGE !!!")
         conv_rates[0] = changed_conv_rates
 
