@@ -15,12 +15,11 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
         learner.reset()
 
         for i in range(iteration):
-            for y in range(daily_simulation):
-                learner.debug()
-                price_pulled = learner.act()
-                reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
-                learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-                learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
+            learner.debug()
+            price_pulled = learner.act()
+            reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
+            learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
+            learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
 
         """
         ucb

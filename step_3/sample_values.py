@@ -27,10 +27,21 @@ def compute_sample_conv_rate(product_visited, items_bought):
                     conv_rate_usr_j[t] = bought[t]/seen[t]
             conv_rate_list.append(conv_rate_usr_j)
 
+
     conv_rates = np.array(conv_rate_list)
     conv_rates = np.reshape(conv_rates, newshape=(-1, numbers_of_products))
 
+    for i in range(5):
+        if counters[i] == 0:
+            conv_rates[i] = 0
+            counters[i] = 1
+
     sample_conv_rates = np.divide(np.sum(conv_rates, axis=0), counters)
+
+    for i in range(sample_conv_rates.shape[0]):
+        if np.isnan(sample_conv_rates[i]).any():
+            print("NAN\n", np.isnan(sample_conv_rates), "\n sample_conv_rates:\n", sample_conv_rates)
+            print("counters:\n", counters, "\n np.sum(conv_rate_list): \n", np.sum(conv_rates))
 
     return sample_conv_rates
 

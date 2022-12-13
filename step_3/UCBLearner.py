@@ -1,5 +1,6 @@
 from Learner import *
 from step_3.sample_values import *
+import math
 
 
 class UCBLearner(Learner):
@@ -18,19 +19,10 @@ class UCBLearner(Learner):
 
     def act(self):
 
-        for arm_id in range(self.n_arms):
-            # TODO : change how price pulled iterate
-            simulated_super_arm = np.array([arm_id for _ in range(self.n_products)])
-            #simulated_super_arm = price_pulled
-            self.sim.prices, self.sim.margins = get_prices_and_margins(simulated_super_arm)
-            self.sim.prices_index = simulated_super_arm
-            reward, *_ = website_simulation(self.sim, self.users)
-            self.expected_rewards[np.arange(self.n_products), simulated_super_arm] = reward
-
         if debug:
             print("Expected rewards : \n", self.expected_rewards)
 
-        return np.argmax(self.expected_rewards, axis=1)
+        return np.argmax((self.widths + self.means) * (self.expected_rewards + get_all_margins()), axis=1)
 
     def update_pulled_and_success(self, price_pulled, product_visited, items_bought, items_rewards):
 
@@ -43,8 +35,8 @@ class UCBLearner(Learner):
             update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought, n_step=3)
 
     def estimate_conversion_rates(self):
-        #return self.means + self.widths
-        return self.means
+        return self.means + self.widths
+        #return self.means
 
     def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
 
@@ -68,6 +60,7 @@ class UCBLearner(Learner):
         # update upper bounds, arm counters of previous day
         for product in range(self.n_products):
             for idx in range(self.n_arms):
+                n = len(items_bought[0])
                 if self.arm_counters[product, idx] > 0:
                     self.widths[product, idx] = np.sqrt((2 * np.log(self.t)) / self.arm_counters[product, idx])
                 else:
@@ -75,6 +68,15 @@ class UCBLearner(Learner):
 
         # update counters
         self.arm_counters[np.arange(0, self.n_products), price_pulled] += 1
+
+        for arm_id in range(self.n_arms):
+            # TODO : change how price pulled iterate
+            simulated_super_arm = np.array([arm_id for _ in range(self.n_products)])
+            # simulated_super_arm = price_pulled
+            self.sim.prices, self.sim.margins = get_prices_and_margins(simulated_super_arm)
+            self.sim.prices_index = simulated_super_arm
+            reward, *_ = website_simulation(self.sim, self.users)
+            self.expected_rewards[np.arange(self.n_products), simulated_super_arm] = reward
 
         return 0
 

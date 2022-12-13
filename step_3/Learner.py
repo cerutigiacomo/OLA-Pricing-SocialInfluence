@@ -14,7 +14,7 @@ def update_step_parameters_of_simulation(users, estimated_conv_rates, product_vi
             for user in users:
                 for prod in range(numbers_of_products):
                     for arm in range(different_value_of_prices):
-                        if estimated_conv_rates[prod,arm] != 0.0 :
+                        if estimated_conv_rates[prod,arm] != 0 :
                             user.conv_rates[prod,arm] = estimated_conv_rates[prod,arm]
 
                 # STEP 4-5

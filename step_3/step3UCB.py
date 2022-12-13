@@ -37,7 +37,7 @@ learner = UCBLearner(lamb, secondary, [0], 4)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-iteration = 30
+iteration = 300
 daily_interaction = 30
 
 #final_reward= np.zeros(iteration)
@@ -45,17 +45,14 @@ daily_interaction = 30
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
-#iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
-for y in range(100):
-    #learner.debug()
-    price_pulled = learner.act()
-    reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
-    learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-    learner.update_pulled_and_success(price_pulled, product_visited, items_bought, items_rewards)
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB")
+
 
 rewards = learner.means
 widths = learner.widths
+
 pp = enumerate_price_products(rewards,widths)
+
 
 fig2 = plt.figure(2,figsize=(30,10))
 x_values = np.arange(len(pp))
