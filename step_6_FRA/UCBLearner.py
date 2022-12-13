@@ -32,11 +32,12 @@ class UCBLearner(Learner):
         # TODO : clipping is wrong ?
         estimated_conv_rate = np.clip(estimated_conv_rate, a_min=0, a_max=1)
         self.users = \
-            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought, n_step=3)
+            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought,
+                                                 n_step=3)
 
     def estimate_conversion_rates(self):
         return self.means + self.widths
-        #return self.means
+        # return self.means
 
     def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
 
@@ -47,15 +48,15 @@ class UCBLearner(Learner):
             print("PRICE PULLED : \n", price_pulled)
             print("REWARD OBSERVED : \n", reward)
 
-        sample_conv_rates = compute_sample_conv_rate(product_visited, items_bought)
-
-        # update of confidence bounds
-
-        # update means
-        past_averages = self.means[np.arange(0, self.n_products), price_pulled]
-        len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
-        self.means[np.arange(0, self.n_products), price_pulled] = \
-            ((past_averages * len_averages) + sample_conv_rates) / (len_averages + 1)
+        # sample_conv_rates = compute_sample_conv_rate(product_visited, items_bought)
+        #
+        # # update of confidence bounds
+        #
+        # # update means
+        # past_averages = self.means[np.arange(0, self.n_products), price_pulled]
+        # len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
+        # self.means[np.arange(0, self.n_products), price_pulled] = \
+        #     ((past_averages * len_averages) + sample_conv_rates) / (len_averages + 1)
 
         # update upper bounds, arm counters of previous day
         for product in range(self.n_products):
@@ -80,7 +81,6 @@ class UCBLearner(Learner):
 
         return 0
 
-
     def debug(self):
         if debug:
             print("LEARNER BOUNDS ...")
@@ -88,7 +88,6 @@ class UCBLearner(Learner):
             print("arms counter : \n", self.arm_counters)
             print("widths : \n", self.widths)
             print("estimated conversion rates : \n", self.estimate_conversion_rates())
-
 
     def update_step(self, a):
         if self.step == 3:
@@ -98,20 +97,6 @@ class UCBLearner(Learner):
             for i in range(len(users_classes)):
                 self.learner.users[i].alpha = a
 
-        """
-        00000 -> 10
-        10000 -> 15
-        20000 -> 20
-        ...
-        01000 -> 11
-        02000 -> 16
-        03000 -> 21
-        ...
-        00001 -> 12
-        00002 -> 17
-        00003 -> 22
-        
-        """
 
         rew = np.zeros((numbers_of_products, different_value_of_prices))
         for prod in range(numbers_of_products):
@@ -119,7 +104,6 @@ class UCBLearner(Learner):
                 index_prices = np.zeros(numbers_of_products)
                 index_prices[prod] = arm
                 rew[prod] = self.simulate(index_prices)[prod]
-
 
     def simulate(self, price_pulled):
         self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)

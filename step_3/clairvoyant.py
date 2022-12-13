@@ -1,4 +1,4 @@
-from UCBLearner import *
+from step_3.UCBLearner import *
 
 debug = False
 
@@ -9,6 +9,7 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     for i in range(len(products)):
         prices_of_products.append(products[i]['price'])
         costs_of_products.append(products[i]['cost'])
+    # create an array with the prices(5x4) and the costs(1x5) of every product
     prices_of_products = np.array(prices_of_products)
     costs_of_products = np.array(costs_of_products)
 
