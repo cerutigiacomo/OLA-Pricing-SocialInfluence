@@ -1,7 +1,8 @@
 from copy import deepcopy
-import numpy.random as npr
 import numpy as np
 from scipy.stats import bernoulli
+
+from resources.define_distribution import get_prices_and_margins
 
 
 class Simulator:
@@ -16,6 +17,7 @@ class Simulator:
         self.items_rewards = np.zeros(5)
         self.secondary_product = secondary
         self.prices_index = prices_index
+        self.prices, self.margins = get_prices_and_margins(prices_index)
 
     def reset(self):
         self.visited_primaries = []

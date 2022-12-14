@@ -175,3 +175,9 @@ def get_scaled_reward(reward, price_pulled):
     p, margin = get_prices_and_margins(price_pulled)
 
     return margin
+
+def get_lambda():
+    return data["product"]["lambda"]
+
+def get_secondary():
+    return data["simulator"]["secondary"]

@@ -1,5 +1,7 @@
-from resources.Environment import Environment
-from step_3.UCBLearner import *
+from Environment import Environment
+from resources.define_distribution import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 debug = False
 
@@ -74,10 +76,11 @@ def find_not_aggregated_reward(best_arm_per_class, env):
     # TODO find the best reward for the not aggregated case
     return total_reward
 
+
 def find_reward_per_class(arm, user_class, env):
     iteration = 20
     rew = np.zeros(iteration)
-    environment = Environment(env.n_arms, env.prices, env.prices, env.lam, env.secondary, arm, [user_class])
+    environment = Environment(env.n_arms, env.prices, env.prices, arm, [user_class])
     for i in range(iteration):
         reward, product_visited, items_bought, items_rewards = environment.round(arm)
         reward = np.sum(reward)

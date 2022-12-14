@@ -49,6 +49,7 @@
     "classes": [
       {
         "name": "Student",
+        "fraction_between_other_classes": 0.4,
         "reservation_price": 10,
         "features": [true, false],
         "alpha": {
@@ -72,6 +73,7 @@
       },
       {
         "name": "Worker",
+        "fraction_between_other_classes": 0.3,
         "reservation_price": 15,
         "features": [false, false],
         "alpha": {
@@ -95,6 +97,7 @@
       },
       {
         "name": "Professor",
+        "fraction_between_other_classes": 0.3,
         "reservation_price": 13,
         "features": [false, true],
         "alpha": {

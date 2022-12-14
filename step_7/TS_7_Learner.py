@@ -1,12 +1,15 @@
-from Learner.Learner import *
+from step_7.Learner import *
 
 reduction_factor = 0.3 # used to reduce the number of customer during the learner simulation for updating the means
 
 class TSLearner(Learner):
 
-    def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products):
-        super().__init__(lamb, secondary, users_classes, n_prices, n_products)
+    def __init__(self, users_classes, n_prices, n_products=numbers_of_products):
+        super().__init__(n_prices, n_products)
 
+
+        self.users_classes = users_classes
+        self.users = get_users(users_classes)
         # upper confidence bounds of arms
         # optimistic estimation of the rewards provided by arms
         self.beta_parameters = np.ones((n_products, n_prices, 2))

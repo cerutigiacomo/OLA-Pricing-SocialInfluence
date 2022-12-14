@@ -2,7 +2,7 @@ from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 
 
-mean_iteration = 5
+mean_iteration = 2
 def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
 
     global price_pulled, reward_observed, product_visited, items_bought, items_rewards, clairvoyant_margin_values
@@ -17,6 +17,7 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
         learner.reset()
 
         for i in range(iteration):
+            print("iteration: ", i)
             learner.debug()
             price_pulled = learner.act()
             reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)

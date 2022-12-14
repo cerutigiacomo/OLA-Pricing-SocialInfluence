@@ -36,8 +36,8 @@ learner = UCBLearner(lamb, secondary, [0], 4)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-iteration = 300
-daily_interaction = 30
+iteration = 100
+daily_interaction = 5
 
 #final_reward= np.zeros(iteration)
 #cumulative_regret = np.zeros(iteration)
