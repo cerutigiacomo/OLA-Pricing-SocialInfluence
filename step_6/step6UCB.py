@@ -1,8 +1,9 @@
-import scipy.special
-
-from Learner.clairvoyant import *
-from resources.Environment import Environment
+from Learner.Learner import *
+from Learner.clairvoyant import find_clairvoyant_indexes
+from resources.NSEnvironment import NSEnvironment
+from step_3.UCBLearner import UCBLearner
 from step_3.iterate_env import iterate
+from step_6.UCBSWLearner import UCBSWLearner
 
 
 def enumerate_price_products(conv_rate, wdt):
@@ -33,19 +34,21 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-learner = UCBLearner(lamb, secondary, [0], 4)
+iteration = 100
+daily_interaction = 5
+
+tau = int(np.sqrt(iteration))
+
+learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
+#learner = UCBLearner(lamb, secondary, [0], 4)
+
 # conversion_rates not observable, then the learner will estimate them.
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-iteration = 100
-daily_interaction = 5
+changes_instant = [50]
 
-#final_reward= np.zeros(iteration)
-#cumulative_regret = np.zeros(iteration)
-#cumulative_reward = np.zeros(iteration)
-
-env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
+env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
 iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
 
 
@@ -67,43 +70,3 @@ plt.ylim(-2, 3)
 plt.grid()
 plt.show()
 
-
-# TODO : add as a function if needed
-
-# COMPUTE UPPER BOUND ON REGRET UCB
-clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, 30)
-clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
-observed_reward = learner.list_margins
-
-delta_reward = np.subtract(clairvoyant_margin_iterated,observed_reward)
-upper_bound_regret_list = []
-
-c1 = 4*np.log(learner.t)
-for val in delta_reward:
-    if val > 0:
-        x = (c1/val)+(8 * val)
-        upper_bound_regret_list.append(x)
-
-upper_bound_regret = np.sum(np.array(upper_bound_regret_list))
-
-print("UPPER BOUND REGRET  = ", upper_bound_regret)
-
-
-def _upper_bound_regret_TS():
-    clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, 30)
-    clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
-    observed_reward = learner.list_margins
-    delta_reward = np.subtract(clairvoyant_margin_iterated, observed_reward)
-
-    kl = scipy.special.kl_div(clairvoyant_margin_iterated,observed_reward)
-
-    c = np.log(learner.t) + np.log(np.log(learner.t))
-    upper_bound_regret_list = []
-    for val,kl in zip(delta_reward,kl):
-        if val > 0:
-            x = (val * c / kl)
-            upper_bound_regret_list.append(x)
-
-    eps = 0.001
-    upper_bound_regret = (1+eps)*np.sum(upper_bound_regret_list)
-    pass

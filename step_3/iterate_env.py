@@ -10,10 +10,12 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
     cumulative_reward = np.zeros((mean_iteration, iteration))
     cumulative_regret = np.zeros((mean_iteration, iteration))
     final_reward = np.zeros((mean_iteration, iteration))
+
     for z in range(mean_iteration):
         product_visited_list = []
         items_bought_list = []
         print("plot ite: ", z)
+        # re-initialized lambda, secondary prod, user classes, no of arms
         learner.reset()
 
         for i in range(iteration):

@@ -1,4 +1,4 @@
-from step_6.Environment.Environment import *
+from step_6_FRA.Environment.Environment import *
 
 class NS_Environment(Environment):
 

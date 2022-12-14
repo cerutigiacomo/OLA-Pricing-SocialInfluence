@@ -1,8 +1,5 @@
-import numpy as np
-import numpy.random as npr
 import math
-from Learner import *
-from copy import deepcopy
+from step_6_FRA.Learner import *
 from scipy.stats import bernoulli
 from resources.define_distribution import *
 import json
