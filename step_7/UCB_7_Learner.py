@@ -1,6 +1,5 @@
 from Learner import *
 from step_3.sample_values import *
-import math
 
 
 class UCBLearner(Learner):
@@ -153,11 +152,14 @@ class UCBLearner(Learner):
 
         if not isinstance(arm_pulled[0], list):
             current_prices = [i[j] for i, j in zip(get_all_margins(), arm_pulled)]
+            current_reward = sum(num_bought_p * np.array(current_prices))
         else:
             if len(arm_pulled[0]) == 0:
                 return
             current_prices = [i[j] for i, j in zip(get_all_margins(), arm_pulled[0][-1])]
-        current_reward = sum(num_bought_p * np.array(current_prices))
+            current_reward = sum(num_bought_products[0][-1] * np.array(current_prices))
+
+
         self.current_reward.append(current_reward)
 
     def get_opt_arm_value(self):
