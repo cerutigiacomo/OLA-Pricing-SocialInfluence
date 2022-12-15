@@ -24,4 +24,5 @@ class Users_group:
         self.conv_rates = conv_rates
 
     def get_n_items_to_buy(self, product):
-        return int(npr.uniform(1, self.n_items_bought[product]))
+        return self.n_items_bought[product]
+        # return int(npr.uniform(1, self.n_items_bought[product]))

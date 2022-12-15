@@ -8,6 +8,7 @@ from step_7.ContextualLearner import ContextualLearner
 #from step_7.TS_7_Learner import *
 from step_7.UCB_7_Learner import *
 from step_7.choice_user_class import get_right_user_class
+import math
 
 f = open('../resources/environment.json')
 data = json.load(f)
@@ -39,7 +40,7 @@ for k in range (PLOT_ITERATION):
                                           env, best_index, SIMULATION_ITERATIONS)
     best_reward_array = [best_reward for _ in range(DAYS)]
 
-    best_prices_per_class = [[3, 3, 2, 1, 3], [3, 3, 1, 3, 2], [3, 3, 1, 1, 3]]
+    best_prices_per_class = [[3, 3, 3, 1, 3], [3, 3, 1, 3, 2], [3, 3, 1, 1, 3]]
     best_not_aggregated_reward = find_not_aggregated_reward(best_prices_per_class, env)
 
     context_learner = ContextualLearner(features=features, n_arms=env.n_arms, n_products=numbers_of_products)
@@ -87,6 +88,17 @@ for k in range (PLOT_ITERATION):
 
         learner.update(pulled_arms, rew, visited_products, num_bought_products)
         context_generator.update_average_rewards(current_features=name_features)
+
+        if context_generator.average_rewards[-1] > 700:
+            print("context_generator rewards OVER 400: ", context_generator.average_rewards[-1],
+                  " Pulled arms: ", pulled_arms,
+                  " rew: ", np.sum(rew),
+                  "name feature: ", get_name_feature(name_features))
+        else:
+            print("context_generator rewards: ", context_generator.average_rewards[-1],
+                  " Pulled arms: ", pulled_arms,
+                  " rew: ", np.sum(rew),
+                  "name feature: ", get_name_feature(name_features))
 
         actual_rew.append(context_generator.average_rewards[-1])
         opt_rew.append(best_not_aggregated_reward)

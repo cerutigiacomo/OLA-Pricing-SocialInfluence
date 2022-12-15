@@ -64,7 +64,7 @@
           "max_demand": 0.7
         },
         "n_items_buyed": {
-          "max_item_bought": 15
+          "max_item_bought": 5
         },
         "graph": {
           "min_probability": 0.6,
@@ -88,7 +88,7 @@
           "max_demand": 0.8
         },
         "n_items_buyed": {
-          "max_item_bought": 8
+          "max_item_bought": 3
         },
         "graph": {
           "min_probability": 0.2,
@@ -112,7 +112,7 @@
           "max_demand": 0.9
         },
         "n_items_buyed": {
-          "max_item_bought": 10
+          "max_item_bought": 3
         },
         "graph": {
           "min_probability": 0.5,

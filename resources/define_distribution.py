@@ -181,3 +181,9 @@ def get_lambda():
 
 def get_secondary():
     return data["simulator"]["secondary"]
+
+def get_name_feature(features):
+    d = data["users"]["classes"]
+    for i in range(3):
+        if d[i]["features"][0] == features[0] and d[i]["features"][1] == features[1]:
+            return d[i]["name"]
