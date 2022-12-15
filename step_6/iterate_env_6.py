@@ -65,7 +65,7 @@ def iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_sim
         final_reward[z,:] = learner.list_margins
 
     # Plot Regret and Reward
-    plot_regret_reward(cumulative_regret,
+    plot_regret_reward_UCB6(cumulative_regret,
                        cumulative_reward,
                        final_reward,
                        clairvoyant_margin_values,

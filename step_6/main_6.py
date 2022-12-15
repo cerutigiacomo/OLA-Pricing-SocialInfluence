@@ -34,9 +34,9 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(us
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-iteration = 20
+iteration = 50
 daily_interaction = 5
-changes_instant = [10]
+changes_instant = [25]
 
 tau = int(np.sqrt(iteration))
 

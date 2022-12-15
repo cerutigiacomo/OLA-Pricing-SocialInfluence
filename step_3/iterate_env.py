@@ -3,7 +3,7 @@ from plotting.plot_reward_regret import *
 
 
 mean_iteration = 2
-def iterate(changes_instant, learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
+def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
 
     global price_pulled, reward_observed, product_visited, items_bought, items_rewards, clairvoyant_margin_values
 
@@ -28,10 +28,6 @@ def iterate(changes_instant, learner, env, iteration, daily_simulation, clairvoy
             learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
             learner.update_pulled_and_success(price_pulled,
                                               product_visited_list, items_bought_list, items_rewards)
-            # if i > changes_instant[0]:
-            #     clairvoyant_margin_values_new = find_clairvoyant_reward(learner, env, clairvoyant_price_index,
-            #                                                         daily_simulation)
-            #     print("NEW CLAIRVOYANT", clairvoyant_margin_values_new)
 
         """
         ucb
@@ -57,6 +53,5 @@ def iterate(changes_instant, learner, env, iteration, daily_simulation, clairvoy
                        cumulative_reward,
                        final_reward,
                        clairvoyant_margin_values,
-                       clairvoyant_margin_values_new,
                        label_alg=name_alg,
                        day=iteration)
