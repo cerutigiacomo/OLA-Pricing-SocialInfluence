@@ -1,8 +1,8 @@
 from Learner.Learner import *
 from Learner.clairvoyant import find_clairvoyant_indexes
 from resources.NSEnvironment import NSEnvironment
-from step_3.UCBLearner import UCBLearner
-from step_3.iterate_env import iterate
+from UCBLearner import UCBLearner
+from iterate_env_6 import iterate
 from step_6.UCBSWLearner import UCBSWLearner
 
 
@@ -25,48 +25,46 @@ prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
 # TODO : update aggregate data which has been taken from Student for test purposes
 users = get_users(class_choosed)
-conv_rates_aggregated = users[0].conv_rates
+user_conv_rates = users[0].conv_rates
+print("REAL CONV RATES USER 0: \n", user_conv_rates)
 
-#
-clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(conv_rates_aggregated)
+clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(user_conv_rates)
 
 
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-iteration = 100
+iteration = 20
 daily_interaction = 5
+changes_instant = [10]
 
 tau = int(np.sqrt(iteration))
 
-learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
-#learner = UCBLearner(lamb, secondary, [0], 4)
-
-# conversion_rates not observable, then the learner will estimate them.
-for i in range(len(class_choosed)):
-    learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
-
-changes_instant = [50]
-
+#learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
+learner = UCBLearner(lamb, secondary, [0], 4)
 env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+
+env.users[0].conv_rates = user_conv_rates
+learner.users[0].conv_rates = user_conv_rates
+
+iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
 
 
-rewards = learner.means
-widths = learner.widths
-
-pp = enumerate_price_products(rewards,widths)
-
-
-fig2 = plt.figure(2,figsize=(30,10))
-x_values = np.arange(len(pp))
-colors = ["r","g","b","y","m"]
-for x in x_values:
-    plt.scatter(x,pp[x][2],color=colors[pp[x][0]])
-    #plt.vlines(x=x,ymin=pp[x][2]-pp[x][3],ymax=pp[x][2]+pp[x][3],colors=colors[pp[x][0]])
-    plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]],capsize=3)
-plt.xticks(x_values)
-plt.ylim(-2, 3)
-plt.grid()
-plt.show()
+# rewards = learner.means
+# widths = learner.widths
+#
+# pp = enumerate_price_products(rewards,widths)
+#
+#
+# fig2 = plt.figure(2,figsize=(30,10))
+# x_values = np.arange(len(pp))
+# colors = ["r","g","b","y","m"]
+# for x in x_values:
+#     plt.scatter(x,pp[x][2],color=colors[pp[x][0]])
+#     #plt.vlines(x=x,ymin=pp[x][2]-pp[x][3],ymax=pp[x][2]+pp[x][3],colors=colors[pp[x][0]])
+#     plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]],capsize=3)
+# plt.xticks(x_values)
+# plt.ylim(-2, 3)
+# plt.grid()
+# plt.show()
 

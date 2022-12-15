@@ -31,6 +31,7 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     best_margin_for_unit = np.argmax(margins_of_products, axis=1)
     clairvoyant_margin_values = margins_of_products[np.arange(numbers_of_products), best_margin_for_unit]
 
+    # ???
     best_margin_for_unit = [3, 1, 3, 1, 2]
     print("Indici dei clairvoyant price_index : \n", best_margin_for_unit)
     print("Effettivi valori di margine : \n", clairvoyant_margin_values)
