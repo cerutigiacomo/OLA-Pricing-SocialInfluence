@@ -41,16 +41,10 @@ def iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_sim
             print("iteration: ", i)
             learner.debug()
             price_pulled = learner.act()
-            reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
+            reward_observed, product_visited, items_bought, items_rewards = env.round_6(price_pulled)
             product_visited_list += product_visited[0]
             items_bought_list += items_bought[0]
             learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-            #learner.update_pulled_and_success(price_pulled,
-            #                                  product_visited_list, items_bought_list, items_rewards)
-            # if i > changes_instant[0]:
-            #     clairvoyant_margin_values_new = find_clairvoyant_reward(learner, env, clairvoyant_price_index,
-            #                                                         daily_simulation)
-            #     print("NEW CLAIRVOYANT", clairvoyant_margin_values_new)
 
             if i < env.changes_instant[0]:
                 clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)

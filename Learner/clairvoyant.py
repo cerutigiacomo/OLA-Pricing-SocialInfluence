@@ -43,7 +43,7 @@ def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulat
     y_clairvoyant = 0
     rew = np.zeros(daily_simulation)
     for i in range(daily_simulation):
-        reward, product_visited, items_bought, items_rewards = env.round(clairvoyant_price_index)
+        reward, product_visited, items_bought, items_rewards = env.round_6(clairvoyant_price_index)
         reward = np.sum(reward)
         rew[i] = reward
         y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)

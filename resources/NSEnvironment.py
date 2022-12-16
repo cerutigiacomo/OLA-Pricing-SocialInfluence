@@ -22,6 +22,11 @@ class NSEnvironment(Environment):
 
         return super().round(pulled_arm)
 
+    # Method for step 6
+    def round_6(self, pulled_arm):
+        self.t += 1
+        return super().round(pulled_arm)
+
     def _abrupt_change1(self):
 
         classes_idx = [i for i in range(len(self.users))]

@@ -34,9 +34,9 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(us
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-iteration = 50
+iteration = 10
 daily_interaction = 5
-changes_instant = [25]
+changes_instant = [5]
 
 tau = int(np.sqrt(iteration))
 
@@ -49,7 +49,7 @@ learner.users[0].conv_rates = user_conv_rates
 
 iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6UCB", 3)
 
-
+# PLOT THE ARMS
 # rewards = learner.means
 # widths = learner.widths
 #
