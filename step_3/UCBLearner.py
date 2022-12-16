@@ -1,3 +1,5 @@
+from scipy.stats import bernoulli
+
 from Learner.Learner import *
 from step_3.sample_values import *
 import math
@@ -21,16 +23,38 @@ class UCBLearner(Learner):
         self.bought = np.zeros(shape=(self.n_products, self.n_arms))
 
     def reset(self):
-        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms, step = self.step)
+        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms, step=self.step)
 
     def act(self):
 
         if debug:
             print("Expected rewards : \n", self.expected_rewards)
 
-        #return np.argmax((self.widths + self.means) * (self.expected_rewards + get_all_margins()), axis=1)
-        #return np.argmax(self.widths *(get_all_margins()*np.random.uniform(0,self.bought,size=(self.n_products, self.n_arms)) + self.expected_rewards), axis=1)
-        return np.argmax(self.expected_rewards, axis=1)
+
+        '''
+        return np.argmax(
+           # (self.widths + self.means) *
+            (
+                    (   get_all_margins() *
+                        np.random.uniform(bernoulli.rvs(self.means, size=(self.n_products, self.n_arms)), self.bought, size=(self.n_products, self.n_arms))
+                    ) + self.expected_rewards)
+            , axis=1)
+        '''
+        def scale_min_max(matrix):
+            max = np.max(matrix.flatten())
+            min = np.min(matrix.flatten())
+            scaled_matrix = (matrix-min)/(max-min)
+            return scaled_matrix
+
+        return np.argmax(
+            (scale_min_max(self.means + self.widths) * (get_all_margins() * np.random.uniform(1,self.bought,size=(self.n_products, self.n_arms)))
+             + scale_min_max(self.means + self.widths) * self.expected_rewards), axis=1)
+
+        #return np.argmax((self.means * (get_all_margins() * np.random.uniform(1,self.bought,size=(self.n_products, self.n_arms))) + self.expected_rewards), axis=1)
+
+        #return np.argmax(self.widths*self.expected_rewards, axis=1)
+        #return np.argmax(self.means , axis=1)
+        #return np.argmax(self.expected_rewards, axis=1)
 
     def update_pulled_and_success(self, price_pulled, product_visited, items_bought, items_rewards):
 
@@ -60,7 +84,7 @@ class UCBLearner(Learner):
         sample_conv_rates = compute_sample_conv_rate(product_visited, items_bought)
 
         # update of confidence bounds
-        self.update_means(price_pulled,sample_conv_rates)
+        self.update_means(price_pulled, sample_conv_rates)
         self.update_bounds()
 
         self.update_arm_counters(price_pulled)
@@ -93,23 +117,23 @@ class UCBLearner(Learner):
         temp_reward = np.zeros((self.n_products, self.n_arms))
         for product in range(self.n_products):
             for arm_id in range(self.n_arms):
-                simulated_super_arm = price_pulled
+                simulated_super_arm = price_pulled.copy()
                 simulated_super_arm[product] = arm_id
                 self.sim.prices, self.sim.margins = get_prices_and_margins(simulated_super_arm)
                 self.sim.prices_index = simulated_super_arm
                 reward, *_ = website_simulation(self.sim, self.users)
-                temp_reward[np.arange(self.n_products), simulated_super_arm] = reward
+                temp_reward[product, simulated_super_arm[product]] = reward[product]
 
-        # self.expected_rewards = (self.expected_rewards + temp_reward) /2
+        #self.expected_rewards = (self.expected_rewards + temp_reward) /2
         self.expected_rewards = temp_reward
 
     def update_boughts(self, price_pulled, product_visited, items_bought):
         # TODO : not currently used in the arm selection function -> if used get from user class values ?
-        mean_bought = compute_sample_n_bought(product_visited, items_bought) # REFERS TO SAMPLE OF LAST ITERATION
+        mean_bought = compute_sample_n_bought(product_visited, items_bought)  # REFERS TO SAMPLE OF LAST ITERATION
         for product in range(self.n_products):
             if np.isnan(mean_bought)[product]:
                 continue
-            #self.bought[product, price_pulled[product]] = (self.bought[product, price_pulled[product]] + mean_bought[product])/2 # REFERS TO A TOTAL MEAN OF AL DAYS
+            # self.bought[product, price_pulled[product]] = (self.bought[product, price_pulled[product]] + mean_bought[product])/2 # REFERS TO A TOTAL MEAN OF AL DAYS
             self.bought[product, price_pulled[product]] = mean_bought[product]
         self.bought = np.floor(self.bought)
 

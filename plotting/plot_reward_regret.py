@@ -18,7 +18,10 @@ def plot_regret_reward(cumulative_regret,
                        best_revenue,
                        label_alg,
                        day=days):
-    best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
+
+    #best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
+    best_revenue_array = best_revenue
+
     mean_cumulative_regret, stdev_regret = mean_std(cumulative_regret, day)
     mean_cumulative_reward, stdev_cumulative_reward = mean_std(cumulative_reward, day)
     mean_reward, stdev_reward = mean_std(final_reward, day)
@@ -32,7 +35,7 @@ def plot_regret_reward(cumulative_regret,
 
     ax[1].plot(mean_reward, color='blue', label=label_alg)
     ax[1].fill_between(range(day), mean_reward - stdev_reward, mean_reward + stdev_reward, alpha=0.4)
-    ax[1].axhline(y=best_revenue, color='red', linestyle='--', label='Clairvoyant')
+    ax[1].plot(best_revenue, color='red', linestyle='--', label='Clairvoyant')
     ax[1].set_title('Reward')
     ax[1].legend()
     ax[1].grid()
