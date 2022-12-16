@@ -15,7 +15,7 @@ class ContextGenerator:
     """
 
     def __init__(self, features: [], contextual_learner: ContextualLearner,
-                 users_classes_to_import,
+                 users_classes_to_import, days_to_simulate,
                  confidence: float, iteration):
         """
         Class constructor
@@ -44,6 +44,7 @@ class ContextGenerator:
 
         self.context_tree = ContextNode(features, self.contextual_learner.get_root_learner())
         self.users_classes_to_import = users_classes_to_import
+        self.days_to_simulate = days_to_simulate
 
         self.update_contextual_learner()
 
@@ -268,7 +269,7 @@ class ContextGenerator:
             learner = UCB(self.users_classes_to_import, 4, step=4)
         else:
             # TODO FIX the other algorithm!
-            learner = TS(self.users_classes_to_import, 4, step=4)
+            learner = TS(self.users_classes_to_import, different_value_of_prices, interaction=self.days_to_simulate, step=4)
 
         rew = np.expand_dims(reward, axis=0).tolist()
         pulled = np.expand_dims(pulled_arms, axis=0).tolist()

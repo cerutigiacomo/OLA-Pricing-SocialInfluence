@@ -105,37 +105,6 @@ class UCBLearner(Learner):
             print("estimated conversion rates : \n", self.estimate_conversion_rates())
 
 
-    def update_step(self, a):
-        if self.step == 3:
-            for i in range(len(users_classes)):
-                self.learner.users[i].conv_rates = a
-        if self.step == 4:
-            for i in range(len(users_classes)):
-                self.learner.users[i].alpha = a
-
-        """
-        00000 -> 10
-        10000 -> 15
-        20000 -> 20
-        ...
-        01000 -> 11
-        02000 -> 16
-        03000 -> 21
-        ...
-        00001 -> 12
-        00002 -> 17
-        00003 -> 22
-        
-        """
-
-        rew = np.zeros((numbers_of_products, different_value_of_prices))
-        for prod in range(numbers_of_products):
-            for arm in range(self.n_arms):
-                index_prices = np.zeros(numbers_of_products)
-                index_prices[prod] = arm
-                rew[prod] = self.simulate(index_prices)[prod]
-
-
     def simulate(self, price_pulled):
         self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
         self.sim.prices_index = price_pulled

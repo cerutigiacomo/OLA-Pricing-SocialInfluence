@@ -1,7 +1,7 @@
 from simulator import Simulator
 from website_simulation import *
 
-debug = False
+debug = True
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
@@ -142,7 +142,7 @@ class Learner:
         self.pulled = []
 
     def reset(self):
-        self.__init__(self.users_classes, self.n_arms)
+        self.__init__(self.n_arms, self.n_products)
 
 
     def act(self):

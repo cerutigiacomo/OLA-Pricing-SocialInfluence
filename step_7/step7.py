@@ -5,6 +5,7 @@ from step_7.Environment import Environment
 from step_7.ContextGenerator import ContextGenerator
 from step_7.ContextNode import ContextNode
 from step_7.ContextualLearner import ContextualLearner
+from step_7.TS_7_Learner import TSLearner
 #from step_7.TS_7_Learner import *
 from step_7.UCB_7_Learner import *
 from step_7.choice_user_class import get_right_user_class
@@ -19,6 +20,9 @@ class_choosed = [0]
 PLOT_ITERATION = 5
 DAYS = 100
 SIMULATION_ITERATIONS = 5
+
+# Set as False for running the simulation on TS!
+UCB_LEARNER = False
 
 
 
@@ -44,7 +48,10 @@ for k in range (PLOT_ITERATION):
     best_not_aggregated_reward = find_not_aggregated_reward(best_prices_per_class, env)
 
     context_learner = ContextualLearner(features=features, n_arms=env.n_arms, n_products=numbers_of_products)
-    root_learner = UCBLearner(users_classes_to_import, 4)
+    if UCB_LEARNER:
+        root_learner = UCBLearner(users_classes_to_import, 4)
+    else:
+        root_learner = TSLearner(users_classes_to_import, different_value_of_prices, interaction=DAYS, step=4)
 
     root_node = ContextNode(features=features, base_learner=root_learner)
     context_learner.update_context_tree(root_node)
@@ -53,6 +60,7 @@ for k in range (PLOT_ITERATION):
     context_generator = ContextGenerator(features=features,
                                          contextual_learner=context_learner,
                                          users_classes_to_import=users_classes_to_import,
+                                         days_to_simulate=DAYS,
                                          confidence=0.1,
                                          iteration=SIMULATION_ITERATIONS)
 
@@ -74,6 +82,7 @@ for k in range (PLOT_ITERATION):
 
             pulled_arms = learner.act()
 
+            #print("Iteration: ", str(k), " Day: ", str(i), " Repetition: ", str(j), " User class: ", str(name_features), " Pulled arms: ", str(pulled_arms))
             rew, visited_products, num_bought_products, num_primary = env.round(pulled_arms, current_features)
             num_primary = 0
             # num_primary: number
@@ -85,19 +94,18 @@ for k in range (PLOT_ITERATION):
                                                  num_bought_products=num_bought_products_summed,
                                                  num_primaries=num_primary,
                                                  features=name_features)
-
         learner.update(pulled_arms, rew, visited_products, num_bought_products)
         context_generator.update_average_rewards(current_features=name_features)
 
         if context_generator.average_rewards[-1] > 700:
             print("context_generator rewards OVER 400: ", context_generator.average_rewards[-1],
-                  " Pulled arms: ", pulled_arms,
                   " rew: ", np.sum(rew),
+                  " Pulled arms: ", pulled_arms,
                   "name feature: ", get_name_feature(name_features))
         else:
             print("context_generator rewards: ", context_generator.average_rewards[-1],
-                  " Pulled arms: ", pulled_arms,
                   " rew: ", np.sum(rew),
+                  " Pulled arms: ", pulled_arms,
                   "name feature: ", get_name_feature(name_features))
 
         actual_rew.append(context_generator.average_rewards[-1])
@@ -107,11 +115,12 @@ for k in range (PLOT_ITERATION):
     final_cumulative_reward[k, :] = np.cumsum(actual_rew)
     final_reward[k:] = actual_rew
 
+name = "step_7_UCB" if UCB_LEARNER else "step_7_TS"
 
 # Plot Regret and Reward
 plot_regret_reward_split_classes(final_cumulative_regret,
                    final_cumulative_reward,
                    final_reward,
                    best_reward,
-                   label_alg="step_7_UCB",
+                   label_alg=name,
                    day=DAYS)
