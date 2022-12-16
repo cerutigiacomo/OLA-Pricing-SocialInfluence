@@ -1,16 +1,17 @@
 from Learner.Learner import *
 
-reduction_factor = 0.3 # used to reduce the number of customer during the learner simulation for updating the means
+reduction_factor = 1 # used to reduce the number of customer during the learner simulation for updating the means
 
 class TSLearner(Learner):
 
-    def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products):
+    def __init__(self, lamb, secondary, users_classes, n_prices, n_products=numbers_of_products, step=3):
         super().__init__(lamb, secondary, users_classes, n_prices, n_products)
 
         # upper confidence bounds of arms
         # optimistic estimation of the rewards provided by arms
         self.beta_parameters = np.ones((n_products, n_prices, 2))
 
+        self.step = step
         self.success_by_arm = np.zeros((self.n_products, self.n_arms))
         self.pulled_per_arm = np.zeros((self.n_products, self.n_arms))
         self.nearby_reward = np.zeros((self.n_products, self.n_arms))
@@ -19,7 +20,7 @@ class TSLearner(Learner):
         self.margin = get_all_margins()
 
     def reset(self):
-        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms, self.n_products)
+        self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms, self.n_products, self.step)
 
     def act(self):
         index = np.array([0 for _ in range(self.n_products)])
@@ -63,6 +64,9 @@ class TSLearner(Learner):
             self.estimed_conv_rate = estimed_conv_rate
 
             self.update_users_conv_rates()
+        self.users = \
+            update_step_parameters_of_simulation(self.users, estimed_conv_rate, visited, n_bought_products,
+                                                 self.step)
 
     def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
         # MAIN UPDATE FOR RESULTS PRESENTATION

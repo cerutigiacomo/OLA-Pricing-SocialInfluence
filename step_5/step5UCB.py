@@ -39,15 +39,15 @@ for i in range(len(class_choosed)):
     learner.users[i].alpha = npr.dirichlet(npr.random(numbers_of_products+1), 1).reshape(numbers_of_products + 1)
     learner.users[i].max_item_bought = npr.random(1) * fixed_maximum
 
-iteration = 50
-daily_interaction = 30
+iteration = 100
+daily_interaction = 10
 
 #final_reward= np.zeros(iteration)
 #cumulative_regret = np.zeros(iteration)
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step4UCB")
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step5UCB")
 
 
 rewards = learner.means

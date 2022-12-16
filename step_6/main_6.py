@@ -47,7 +47,7 @@ env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary,
 env.users[0].conv_rates = user_conv_rates
 learner.users[0].conv_rates = user_conv_rates
 
-iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6UCB", 3)
 
 
 # rewards = learner.means

@@ -1,5 +1,5 @@
-from TSLearner import *
-from iterate_env import *
+from step_3.TSLearner import *
+from step_3.iterate_env import *
 from resources.Environment import *
 
 f = open('../resources/environment.json')
@@ -20,7 +20,7 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 
 
 ######### TS
-learner = TSLearner(lamb, secondary, class_choosed, different_value_of_prices, step=3)
+learner = TSLearner(lamb, secondary, class_choosed, different_value_of_prices, step=4)
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary,
                   [0, 0, 0, 0, 0], class_choosed)
 
@@ -29,4 +29,4 @@ for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
 
-iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, "step3TS")
+iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, "step4TS")
