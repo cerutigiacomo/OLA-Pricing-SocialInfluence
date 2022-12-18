@@ -52,8 +52,7 @@ changes_instant = [35]
 env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
 learner2 = UCBLearner(lamb, secondary, [0], 4)
 
-learners = [learner, learner2]
-iterate(learners, env, iteration, daily_interaction, clairvoyant_price_index, "step6SWUCB", 6)
+iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6SWUCB", 6)
 
 rewards = learner.means
 widths = learner.widths

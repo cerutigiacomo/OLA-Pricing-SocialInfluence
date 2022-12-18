@@ -1,3 +1,5 @@
+import copy
+
 from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 from resources.NSEnvironment import NSEnvironment
