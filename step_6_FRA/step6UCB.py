@@ -1,5 +1,6 @@
 from Learner.Learner import *
 from Learner.clairvoyant import find_clairvoyant_indexes
+from plotting.plot_reward_regret import plot_regret_reward
 from resources.NSEnvironment import NSEnvironment
 from step_3.UCBLearner import UCBLearner
 from step_3.iterate_env import iterate
@@ -34,8 +35,8 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-iteration = 100
-daily_interaction = 5
+iteration = 50
+daily_interaction = 3
 
 tau = int(np.sqrt(iteration))
 
@@ -46,11 +47,13 @@ learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-changes_instant = [50]
+changes_instant = [35]
 
 env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+learner2 = UCBLearner(lamb, secondary, [0], 4)
 
+learners = [learner, learner2]
+iterate(learners, env, iteration, daily_interaction, clairvoyant_price_index, "step6SWUCB", 6)
 
 rewards = learner.means
 widths = learner.widths

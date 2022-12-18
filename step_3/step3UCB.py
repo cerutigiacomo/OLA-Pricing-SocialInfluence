@@ -38,8 +38,8 @@ learner = UCBLearner(lamb, secondary, [0], 4)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-iteration = 300
-daily_interaction = 5
+iteration = 150
+daily_interaction = 50
 
 #final_reward= np.zeros(iteration)
 #cumulative_regret = np.zeros(iteration)
@@ -60,6 +60,7 @@ x_values = np.arange(len(pp))
 colors = ["r","g","b","y","m"]
 for x in x_values:
     plt.scatter(x,pp[x][2],color=colors[pp[x][0]])
+    plt.scatter(x,conv_rates_aggregated.flatten()[x],color="m",marker="x")
     #plt.vlines(x=x,ymin=pp[x][2]-pp[x][3],ymax=pp[x][2]+pp[x][3],colors=colors[pp[x][0]])
     plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]],capsize=3)
 plt.xticks(x_values)

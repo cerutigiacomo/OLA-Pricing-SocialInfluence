@@ -7,6 +7,8 @@ def compute_sample_conv_rate(product_visited, items_bought):
 
     sample_conv_rates = np.zeros(shape=numbers_of_products)
     counters = np.zeros(shape=numbers_of_products)
+    counters_boughts = np.zeros(shape=numbers_of_products)
+
     conv_rate_list = []
     for i in range(n_user_classes):
         # product_visited[i] to be accessed which is of length user for that class
@@ -22,6 +24,7 @@ def compute_sample_conv_rate(product_visited, items_bought):
 
             counters += seen
             mask_seen = seen > 0
+            counters_boughts += bought
 
             conv_rate_usr_j = np.zeros(shape=numbers_of_products)
             for t in range(numbers_of_products):
@@ -29,6 +32,9 @@ def compute_sample_conv_rate(product_visited, items_bought):
                     conv_rate_usr_j[t] = bought[t]/seen[t]
             conv_rate_list.append(conv_rate_usr_j)
 
+    convs = counters_boughts / counters
+    #convs = np.where(~np.isnan(convs), convs, 0.5)
+    return convs
 
     conv_rates = np.array(conv_rate_list)
     conv_rates = np.reshape(conv_rates, newshape=(-1, numbers_of_products))

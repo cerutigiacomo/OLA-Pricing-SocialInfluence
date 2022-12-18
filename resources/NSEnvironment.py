@@ -1,5 +1,7 @@
-from resources.Environment import *
+import copy
 
+from resources.Environment import *
+from scipy.stats import beta
 
 class NSEnvironment(Environment):
     def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users, changes_instant):
@@ -8,7 +10,7 @@ class NSEnvironment(Environment):
         self.changes_instant = changes_instant  # list of instant iteration values of abrupt change
 
         # collect user (of each classes with updated convs)
-        self.changes_collector = [(0,self.users)]
+        self.changes_collector = [(0,copy.deepcopy(self.users))]
 
     def reset(self):
         self.__init__(self.n_arms, self.prices, self.sim.margins, self.lam, self.secondary, self.sim.prices_index, self.users_indexes, self.changes_instant)
@@ -42,11 +44,13 @@ class NSEnvironment(Environment):
     def _abrupt_change_with_changes_collector(self):
         classes_idx = [i for i in range(len(self.users))]
         # Define a maximum value of conversion rates for every user class
+        print("PAST CONV RATES : \n", self.users[0].conv_rates)
         for i in range(len(classes_idx)):
-            conv_rates = npr.uniform(0.0, 1.0, (numbers_of_products, different_value_of_prices))
+            randoms = npr.uniform(0.01, 0.3, (numbers_of_products, different_value_of_prices))
+            conv_rates = -np.sort(-randoms)
             self.users[i].conv_rates = conv_rates
-
-        self.changes_collector.append((self.t, self.users))
+        print("NEW CONV RATES : \n",self.users[0].conv_rates)
+        self.changes_collector.append((self.t, copy.deepcopy(self.users)))
 
     def _abrupt_change(self):
         # Random conversion rate (demand curve) generating number between [0, 1)

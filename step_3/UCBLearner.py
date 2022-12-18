@@ -15,10 +15,12 @@ class UCBLearner(Learner):
         self.step = step
         self.means = np.zeros(shape=(self.n_products, self.n_arms))
         self.arm_counters = np.zeros(shape=(self.n_products, self.n_arms))
+        self.len_averages = np.zeros(shape=(self.n_products, self.n_arms))
         self.widths = np.array([[np.inf for _ in range(self.n_arms)] for i in range(self.n_products)])
 
         # attributes for simulation of expectations on reward
         self.expected_rewards = np.zeros(shape=(self.n_products, self.n_arms))
+        self.last_expected_rewards = np.zeros(shape=(self.n_products, self.n_arms))
 
         self.bought = np.zeros(shape=(self.n_products, self.n_arms))
 
@@ -46,12 +48,13 @@ class UCBLearner(Learner):
             scaled_matrix = (matrix-min)/(max-min)
             return scaled_matrix
 
+        arm = np.argmax(self.widths + scale_min_max(self.expected_rewards), axis=1)
+        print("ARM TO BE PULLED : ", arm)
+        return arm
         return np.argmax(
             (scale_min_max(self.means + self.widths) * (get_all_margins() * np.random.uniform(1,self.bought,size=(self.n_products, self.n_arms)))
              + scale_min_max(self.means + self.widths) * self.expected_rewards), axis=1)
-
         #return np.argmax((self.means * (get_all_margins() * np.random.uniform(1,self.bought,size=(self.n_products, self.n_arms))) + self.expected_rewards), axis=1)
-
         #return np.argmax(self.widths*self.expected_rewards, axis=1)
         #return np.argmax(self.means , axis=1)
         #return np.argmax(self.expected_rewards, axis=1)
@@ -79,7 +82,7 @@ class UCBLearner(Learner):
 
         if debug:
             print("PRICE PULLED : \n", price_pulled)
-            print("REWARD OBSERVED : \n", reward)
+        print("REWARD OBSERVED : ", np.sum(reward))
 
         sample_conv_rates = compute_sample_conv_rate(product_visited, items_bought)
 
@@ -96,17 +99,27 @@ class UCBLearner(Learner):
         return 0
 
     def update_means(self, price_pulled, sample_conv_rates):
-        # update means
         past_averages = self.means[np.arange(0, self.n_products), price_pulled]
-        len_averages = self.arm_counters[np.arange(0, self.n_products), price_pulled]
-        self.means[np.arange(0, self.n_products), price_pulled] = \
-            ((past_averages * len_averages) + sample_conv_rates) / (len_averages + 1)
+        print("PAST CONV RATE : ", past_averages)
+        len_averages = self.len_averages[np.arange(0, self.n_products), price_pulled]
+
+        for product in range(self.n_products):
+            if ~np.isnan(sample_conv_rates[product]):
+                self.len_averages[product, price_pulled[product]] += 1
+
+        for product in range(self.n_products):
+            if ~np.isnan(sample_conv_rates[product]):
+                self.means[product,price_pulled[product]] = \
+                    ((past_averages[product] * len_averages[product]) + sample_conv_rates[product]) / (self.len_averages[product,price_pulled[product]])
+        print("NEW CONV RATE : ", self.means[np.arange(0,self.n_products),price_pulled])
+
+
 
     def update_bounds(self):
         for product in range(self.n_products):
             for idx in range(self.n_arms):
                 if self.arm_counters[product, idx] > 0:
-                    self.widths[product, idx] = np.sqrt((2 * np.log(self.t)) / self.arm_counters[product, idx])
+                    self.widths[product, idx] = np.sqrt((0.01 * np.log(self.t)) / self.arm_counters[product, idx])
                 else:
                     self.widths[product, idx] = np.inf
 
@@ -124,8 +137,8 @@ class UCBLearner(Learner):
                 reward, *_ = website_simulation(self.sim, self.users)
                 temp_reward[product, simulated_super_arm[product]] = reward[product]
 
-        #self.expected_rewards = (self.expected_rewards + temp_reward) /2
-        self.expected_rewards = temp_reward
+        self.expected_rewards = (self.expected_rewards + temp_reward) /2
+        self.last_expected_rewards = temp_reward
 
     def update_boughts(self, price_pulled, product_visited, items_bought):
         # TODO : not currently used in the arm selection function -> if used get from user class values ?

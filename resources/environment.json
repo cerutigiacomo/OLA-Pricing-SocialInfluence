@@ -56,8 +56,8 @@
           "alpha_weights": [0.4, 0.8, 0.7, 0.65, 0.5, 0.6]
         },
         "total_user": {
-          "mean_users_per_class": 200,
-          "user_per_class_std": 30
+          "mean_users_per_class": 30,
+          "user_per_class_std": 5
         },
         "demand": {
           "min_demand": 0.3,
