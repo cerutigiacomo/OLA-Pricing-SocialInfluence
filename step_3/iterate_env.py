@@ -1,36 +1,33 @@
-import copy
-
 from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 from resources.NSEnvironment import NSEnvironment
 
 mean_iteration = 2
-def iterate(learners, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
+def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
 
     global price_pulled, reward_observed, product_visited, items_bought, items_rewards, clairvoyant_margin_values
 
-    n_learners = len(learners)
-    cumulative_reward = np.zeros((n_learners, mean_iteration, iteration))
-    cumulative_regret = np.zeros((n_learners, mean_iteration, iteration))
-    final_reward = np.zeros((n_learners, mean_iteration, iteration))
+    cumulative_reward = np.zeros((mean_iteration, iteration))
+    cumulative_regret = np.zeros((mean_iteration, iteration))
+    final_reward = np.zeros((mean_iteration, iteration))
 
     for z in range(mean_iteration):
         product_visited_list = []
         items_bought_list = []
         print("plot ite: ", z)
         # re-initialized lambda, secondary prod, user classes, no of arms
-        for learner in learners:
-            learner.reset()
+        learner.reset()
 
         for i in range(iteration):
             print("iteration: ", i)
-            for learner in learners : price_pulled = learner.act()
+            learner.debug()
+            price_pulled = learner.act()
             reward_observed, product_visited, items_bought, items_rewards = env.round(price_pulled)
             product_visited_list += product_visited[0]
             items_bought_list += items_bought[0]
-            for learner in learners:
-                learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-                learner.update_pulled_and_success(price_pulled,product_visited_list, items_bought_list, items_rewards)
+            learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
+            learner.update_pulled_and_success(price_pulled,
+                                              product_visited_list, items_bought_list, items_rewards)
 
         """
         ucb
@@ -71,25 +68,14 @@ def iterate(learners, env, iteration, daily_simulation, clairvoyant_price_index,
                     t = t_change
                 clairvoyant_margin_values = clairvoyant_margin_iterated
 
-        for i in range(n_learners):
-            cumulative_reward[i, z, :] = np.cumsum(learner.list_margins)
-            cumulative_regret[i, z, :] = np.cumsum(clairvoyant_margin_values) - np.cumsum(learner.list_margins)
-            final_reward[i, z, :] = learner.list_margins
+        cumulative_reward[z, :] = np.cumsum(learner.list_margins)
+        cumulative_regret[z, :] = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
+        final_reward[z, :] = learner.list_margins
 
-
-    # PLOT ----------------------
-
-    fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(12, 8))
-    name_alg=["UCBSW", "UCB"]
-    color_alg =["blue", "green"]
-    for i,learner in enumerate(learners):
-        plot_regret_reward(cumulative_regret[i,:,:],
-                           cumulative_reward[i,:,:],
-                           final_reward[i,:,:],
-                           clairvoyant_margin_values,
-                           ax,
-                           color_alg[i],
-                           label_alg=name_alg[i],
-                           day=iteration)
-
-    plt.show()
+    # Plot Regret and Reward
+    plot_regret_reward(cumulative_regret,
+                       cumulative_reward,
+                       final_reward,
+                       clairvoyant_margin_values,
+                       label_alg=name_alg,
+                       day=iteration)
