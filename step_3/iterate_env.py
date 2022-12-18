@@ -31,16 +31,6 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
             learner.update_pulled_and_success(price_pulled,
                                               product_visited_list, items_bought_list, items_rewards)
 
-        """
-        ucb
-        
-        
-                        learner.update(price_pulled, reward_observed, product_visited, items_bought, items_rewards)
-                        learner.update_step_parameters(product_visited, items_bought, n_step)
-                        
-        prima del mio update
-        
-        """
         match n_step:
             case 3 | 4 | 5:
                 clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)

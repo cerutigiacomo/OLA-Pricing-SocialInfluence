@@ -102,7 +102,7 @@ def find_not_aggregated_reward(best_arm_per_class, env):
 def find_reward_per_class(arm, user_class, env):
     iteration = 20
     rew = np.zeros(iteration)
-    environment = Environment(env.n_arms, env.prices, env.prices, env.lam, env.secondary, arm, [user_class])
+    environment = Environment(env.n_arms, env.prices, env.prices, env.lam, env.secondary, arm, [user_class], get_users(user_class))
     for i in range(iteration):
         reward, product_visited, items_bought, items_rewards = environment.round(arm)
         reward = np.sum(reward)

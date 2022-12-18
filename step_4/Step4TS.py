@@ -22,7 +22,7 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 ######### TS
 learner = TSLearner(lamb, secondary, class_choosed, different_value_of_prices, step=4)
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary,
-                  [0, 0, 0, 0, 0], class_choosed)
+                  [0, 0, 0, 0, 0], class_choosed, get_users(class_choosed))
 
 # conversion_rates not observable, then the learner will estimate them.
 for i in range(len(class_choosed)):

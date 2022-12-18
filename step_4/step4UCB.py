@@ -1,6 +1,7 @@
 from Learner.clairvoyant import *
 from resources.Environment import Environment
 from step_3.iterate_env import iterate
+from step_3.UCBLearner import *
 
 
 def enumerate_price_products(conv_rate, wdt):
@@ -16,8 +17,10 @@ f = open('../resources/environment.json')
 data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 debug = False
-fixed_maximum = 15
+fixed_maximum = 4
 class_choosed = [0]
+iteration = 100
+daily_interaction = 30
 
 prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
@@ -39,14 +42,8 @@ for i in range(len(class_choosed)):
     learner.users[i].alpha = npr.dirichlet(npr.random(numbers_of_products+1), 1).reshape(numbers_of_products + 1)
     learner.users[i].max_item_bought = npr.random(1) * fixed_maximum
 
-iteration = 50
-daily_interaction = 30
 
-#final_reward= np.zeros(iteration)
-#cumulative_regret = np.zeros(iteration)
-#cumulative_reward = np.zeros(iteration)
-
-env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed)
+env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, get_users(class_choosed))
 iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step4UCB")
 
 

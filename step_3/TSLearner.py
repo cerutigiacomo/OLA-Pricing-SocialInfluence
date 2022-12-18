@@ -27,22 +27,70 @@ class TSLearner(Learner):
         for prod in range(self.n_products):
             # generate beta for every price of the current product
             beta = npr.beta(self.beta_parameters[prod, :, 0], self.beta_parameters[prod, :, 1])
-            index[prod] = np.argmax(beta * (self.estimed_conv_rate[prod] * self.nearby_reward[prod]))
+            index[prod] = np.argmax(beta * (get_all_margins()[prod] * self.users[0].get_n_items_to_buy(prod) * self.estimed_conv_rate[prod] * self.nearby_reward[prod]))
+            if debug:
+                np.set_printoptions(precision=2)
+                print("prod: ", prod,
+                      "beta : ", beta,
+                      "nearby_reward : ", self.nearby_reward[prod],
+                      "estimed_conv_rate : ", self.estimed_conv_rate[prod])
         return index
 
+    def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
+        # MAIN UPDATE FOR RESULTS PRESENTATION
+        super().update(price_pulled, reward, None, None, None)
+        if debug:
+            print("PRICE PULLED : ", price_pulled)
+            print("REWARD OBSERVED : ", np.sum(reward))
+
+        self.beta_parameters[:, :, 0] = self.beta_parameters[:, :, 0] + \
+                                        self.success_by_arm[:, :]
+        self.beta_parameters[:, :, 1] = self.beta_parameters[:, :, 1] + \
+                                        self.pulled_per_arm - self.success_by_arm
+
+        self.pulled_per_arm = np.zeros((self.n_products, self.n_arms))
+        self.success_by_arm = np.zeros((self.n_products, self.n_arms))
+
+        # Update the nearby reward by evaluating different prices starting with the price_pulled
+        self.nearby_reward_evaluation(price_pulled)
+
+
+    def nearby_reward_evaluation(self, price_pulled):
+        # get the reward for each arm estimated by the simulation
+
+        nearby_reward = np.zeros((self.n_products, self.n_arms))
+        for prod in range(self.n_products):
+            for arm in range(self.n_arms):
+                price_index = price_pulled.copy()
+                price_index[prod] = arm
+                nearby_reward[prod][arm] = self.simulate(price_index)[prod]
+        self.nearby_reward = (self.nearby_reward + nearby_reward) / 2
+
+    def simulate(self, price_pulled):
+        self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
+        self.sim.prices_index = price_pulled
+        observed_reward, a, b, c = website_simulation(self.sim, self.users, reduction_factor)
+        return observed_reward
+
+
     def update_pulled_and_success(self, pulled_arm, visited, n_bought_products, items_rewards):
+
+        # Update success by arm and pulled per arm for beta parameters.
         for i in range(len(visited)):
             for j in range(len(visited[i])):
                 prod = visited[i][j]
                 if n_bought_products[i][prod] > 0:
                     self.success_by_arm[prod, pulled_arm[prod]] += 1
                 self.pulled_per_arm[prod, pulled_arm[prod]] += 1
-        # Conversion rate per product and price (matrix!)
-        # Estimate the sample_conversion rate for each product
+
+
         counters = np.zeros(shape=self.n_products)
-        estimed_conv_rate = self.estimed_conv_rate
-        for (i, (visited_i, bought_i, rewards_i)) in enumerate(
-                zip(visited, n_bought_products, items_rewards)):
+
+        # If the conv rate == 1, set to 0 to retrieve the mean since probably the arm has not been pulled enough times.
+        estimed_conv_rate = self.get_estimed_conv_rate()
+
+        for (i, (visited_i, bought_i)) in enumerate(
+                zip(visited, n_bought_products)):
             seen = np.zeros(shape=numbers_of_products)
             seen[visited_i] += 1
             bought = np.zeros(shape=numbers_of_products)
@@ -61,63 +109,30 @@ class TSLearner(Learner):
                     estimed_conv_rate[j][pulled_arm[j]] = (a * (counters[j] - 1) + (bought[j]) / seen[j]) \
                                                           / (counters[j])
 
-            self.estimed_conv_rate = estimed_conv_rate
+            # update the conv rate, setting 1 to not visited products
+            self.set_con_rates_to_1(estimed_conv_rate)
 
-            self.update_users_conv_rates()
         self.users = \
             update_step_parameters_of_simulation(self.users, estimed_conv_rate, visited, n_bought_products,
                                                  self.step)
 
-    def update(self, price_pulled, reward, product_visited, items_bought, items_rewards):
-        # MAIN UPDATE FOR RESULTS PRESENTATION
-        super().update(price_pulled, reward, None, None, None)
-        if debug:
-            print("PRICE PULLED : \n", price_pulled)
-            print("REWARD OBSERVED : \n", reward)
+    def get_estimed_conv_rate(self):
+        estimed_conv_rate = np.ones((self.n_products, self.n_arms))
+        for i in range(self.n_products):
+            for j in range(self.n_arms):
+                if self.estimed_conv_rate[i][j] == 1:
+                    estimed_conv_rate[i][j] = 0
+                else:
+                    estimed_conv_rate[i][j] = self.estimed_conv_rate[i][j]
+        return estimed_conv_rate
 
-
-        # TODO update beta parameters
-        self.beta_parameters[:, :, 0] = self.beta_parameters[:, :, 0] + \
-                                        self.success_by_arm[:, :]
-        self.beta_parameters[:, :, 1] = self.beta_parameters[:, :, 1] + \
-                                        self.pulled_per_arm - self.success_by_arm
-
-        self.pulled_per_arm = np.zeros((self.n_products, self.n_arms))
-        self.success_by_arm = np.zeros((self.n_products, self.n_arms))
-
-        # Update the nearby reward by evaluating different prices starting with the price_pulled
-        self.nearby_reward_evaluation(price_pulled)
-
-
-    def simulate(self, price_pulled):
-        self.sim.prices, self.sim.margins = get_prices_and_margins(price_pulled)
-        self.sim.prices_index = price_pulled
-        observed_reward, a, b, c = website_simulation(self.sim, self.users, reduction_factor)
-        return observed_reward
+    def set_con_rates_to_1(self, conv_rates):
+        for i in range(self.n_products):
+            for j in range(self.n_arms):
+                if conv_rates[i][j] == 0:
+                    self.estimed_conv_rate[i][j] = 1
+                else:
+                    self.estimed_conv_rate[i][j] = conv_rates[i][j]
 
     def debug(self):
-        if debug:
-            print("beta par : \n", self.beta_parameters)
-
-
-    def nearby_reward_evaluation(self, price_pulled):
-        # get the reward for each arm estimated by the simulation
-
-        nearby_reward = np.zeros((self.n_products, self.n_arms))
-        for prod in range(self.n_products):
-            for arm in range(self.n_arms):
-                price_index = price_pulled
-                price_index[prod] = arm
-                nearby_reward[prod][arm] = self.simulate(price_index)[prod]
-        self.nearby_reward = (self.nearby_reward + nearby_reward) / 2
-        #if debug:
-        print("nearby_reward: ", self.nearby_reward, "\nestimed_conv_rate: \n", self.estimed_conv_rate, "\n\nusers conv_rates: \n", self.users[0].conv_rates)
-
-    """
-    Update the conversion rate of the users with the mean of the non zero estimated ones.
-    """
-    def update_users_conv_rates(self):
-        for prod in range(self.n_products):
-            for arm in range(self.n_arms):
-                if self.estimed_conv_rate[prod][arm] != 0:
-                    self.users[0].conv_rates[prod][arm] = self.estimed_conv_rate[prod][arm]
+        pass
