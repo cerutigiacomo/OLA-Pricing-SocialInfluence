@@ -20,8 +20,8 @@ def plot_regret_reward(cumulative_regret,
                        label_alg,
                        day=days):
 
-    #best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
-    best_revenue_array = np.max(best_revenue,axis=0)
+    best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
+    #best_revenue_array = np.max(best_revenue,axis=0)
 
     mean_cumulative_regret, stdev_regret = mean_std(cumulative_regret, day)
     mean_cumulative_reward, stdev_cumulative_reward = mean_std(cumulative_reward, day)
