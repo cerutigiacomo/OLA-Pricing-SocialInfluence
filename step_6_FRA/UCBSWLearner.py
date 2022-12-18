@@ -26,9 +26,9 @@ class UCBSWLearner(UCBLearner):
             std = np.std(matrix.flatten())
             return (matrix-mean)/std
 
-        term1 = (0.15) * self.widths
-        term2 = (0.7) * (scale_min_max(self.expected_rewards) * self.widths)
-        term3 = (0.15) * (scale_min_max(self.last_expected_rewards))
+        term1 = (0.25) * self.widths
+        term2 = (0.60) * (scale_min_max(self.expected_rewards))
+        term3 = (0.65) * (scale_min_max(self.last_expected_rewards))
 
         if self.t == 12 or self.t == 13 or self.t ==14:
             print("ITERAZIONE : ",self.t)

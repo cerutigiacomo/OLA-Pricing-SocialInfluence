@@ -4,16 +4,13 @@ from resources.Environment import *
 from scipy.stats import beta
 
 class NSEnvironment(Environment):
-    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users, changes_instant):
-        super().__init__(n_prices, prices, margins, lamb, secondary, prices_index, users)
+    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, user_classes, users, changes_instant):
+        super().__init__(n_prices, prices, margins, lamb, secondary, prices_index, user_classes, users)
         self.t = 0
         self.changes_instant = changes_instant  # list of instant iteration values of abrupt change
 
         # collect user (of each classes with updated convs)
         self.changes_collector = [(0,copy.deepcopy(self.users))]
-
-    def reset(self):
-        self.__init__(self.n_arms, self.prices, self.sim.margins, self.lam, self.secondary, self.sim.prices_index, self.users_indexes, self.changes_instant)
 
     def round(self, pulled_arm):
         self.t += 1

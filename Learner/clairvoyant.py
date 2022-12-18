@@ -28,7 +28,7 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
         # BEST MARGIN FOR A SINGLE UNIT OF PRODUCT
         print(np.multiply(conv_rates_aggregated, margins_of_products))
 
-    best_margin_for_unit = np.argmax(margins_of_products, axis=1)
+    best_margin_for_unit = np.argmax(np.multiply(conv_rates_aggregated, margins_of_products), axis=1)
     clairvoyant_margin_values = margins_of_products[np.arange(numbers_of_products), best_margin_for_unit]
 
     # ???
@@ -37,6 +37,30 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     print("Effettivi valori di margine : \n", clairvoyant_margin_values)
     return best_margin_for_unit, clairvoyant_margin_values
 
+
+def find_clairvoyant_reward_by_simulation(env):
+    sim = env.sim
+    users = env.users
+
+    arms = [[_ for x in range(numbers_of_products)] for _ in range(different_value_of_prices)]
+
+    rewards_tot = np.zeros((numbers_of_products, different_value_of_prices))
+
+
+    N = 100
+
+    for arm in arms:
+        sim.prices, sim.margins = get_prices_and_margins(arm)
+        sim.prices_index = arm
+        for rounds in range(N):
+            rewards, *_ = website_simulation(sim,users)
+            for product in range(numbers_of_products):
+                if rewards[product] > rewards_tot[product,arm[product]]:
+                    rewards_tot[product, arm[product]] = rewards[product]
+
+    best_prices = np.argmax(rewards_tot,axis=1)
+    top_revenue = np.sum(rewards_tot[np.arange(numbers_of_products),best_prices])
+    return best_prices, top_revenue
 
 def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation, plot=False):
     # TODO review

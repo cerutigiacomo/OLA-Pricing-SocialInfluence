@@ -71,25 +71,6 @@ plt.show()
 
 # TODO : add as a function if needed
 
-# COMPUTE UPPER BOUND ON REGRET UCB
-clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, 30)
-clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
-observed_reward = learner.list_margins
-
-delta_reward = np.subtract(clairvoyant_margin_iterated,observed_reward)
-upper_bound_regret_list = []
-
-c1 = 4*np.log(learner.t)
-for val in delta_reward:
-    if val > 0:
-        x = (c1/val)+(8 * val)
-        upper_bound_regret_list.append(x)
-
-upper_bound_regret = np.sum(np.array(upper_bound_regret_list))
-
-print("UPPER BOUND REGRET  = ", upper_bound_regret)
-
-
 def _upper_bound_regret_TS():
     clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, 30)
     clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)

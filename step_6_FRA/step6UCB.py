@@ -1,3 +1,5 @@
+import copy
+
 from Learner.Learner import *
 from Learner.clairvoyant import find_clairvoyant_indexes
 from plotting.plot_reward_regret import plot_regret_reward
@@ -35,8 +37,8 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(co
 ######### UCB
 # TODO iterate the learner more times and get the mean of the results
 
-iteration = 50
-daily_interaction = 3
+iteration = 330
+daily_interaction = 50
 
 tau = int(np.sqrt(iteration))
 
@@ -47,12 +49,20 @@ learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-changes_instant = [35]
+changes_instant = [150, 250]
 
-env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
+
+users_init = copy.deepcopy(users)
+env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, users_init, changes_instant)
+ratio1 = iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6SWUCB", 6)
+
+env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, users, changes_instant)
 learner2 = UCBLearner(lamb, secondary, [0], 4)
+ratio2 = iterate(learner2, env, iteration, daily_interaction, clairvoyant_price_index, "step6UCB", 6)
 
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6SWUCB", 6)
+print("RATIOS :")
+print(ratio1)
+print(ratio2)
 
 rewards = learner.means
 widths = learner.widths

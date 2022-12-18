@@ -48,8 +48,10 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
                 if debug:
                     print("\nReward clairvoyant: ", clairvoyant_margin_values)
                 clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
+
+                # TODO to be adapted with changes
+                changes = []
             case 6:
-                # TODO : to be completed, plotting not sure if works properly
                 assert isinstance(env, NSEnvironment)
                 env_test = copy.deepcopy(env)
                 clairvoyant_margin_iterated = np.zeros(shape=iteration)
@@ -65,19 +67,38 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
                     # clairvoyant_price_index = ...
                     t_change = changes_instants.pop(0)
                     env_test.users = users
-                    clairvoyant_margin_value = find_clairvoyant_reward(learner, env_test, clairvoyant_price_index, daily_simulation)
+                    #clairvoyant_margin_value = find_clairvoyant_reward(learner, env_test, clairvoyant_price_index, daily_simulation)
+                    clairvoyant_indexes, clairvoyant_margin_value = find_clairvoyant_reward_by_simulation(env_test)
+
                     clairvoyant_margin_iterated[t:t_change] = np.repeat(clairvoyant_margin_value, t_change-t)
                     t = t_change
                 clairvoyant_margin_values = clairvoyant_margin_iterated
+                changes = env.changes_instant
 
         cumulative_reward[z, :] = np.cumsum(learner.list_margins)
         cumulative_regret[z, :] = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
         final_reward[z, :] = learner.list_margins
+
 
     # Plot Regret and Reward
     plot_regret_reward(cumulative_regret,
                        cumulative_reward,
                        final_reward,
                        clairvoyant_margin_values,
+                       changes=changes,
                        label_alg=name_alg,
                        day=iteration)
+
+    delta_reward = np.subtract(np.max(clairvoyant_margin_values,axis=0),np.mean(cumulative_reward,axis=0))
+    upper_bound_regret_list = []
+
+    c1 = 4 * np.log(learner.t)
+    for val in delta_reward:
+        if val > 0:
+            x = (c1 / val) + (8 * val)
+            upper_bound_regret_list.append(x)
+
+    upper_bound_regret = np.sum(np.array(upper_bound_regret_list))
+
+    ratio = np.mean(cumulative_regret, axis=0)[-1] / upper_bound_regret
+    return ratio
