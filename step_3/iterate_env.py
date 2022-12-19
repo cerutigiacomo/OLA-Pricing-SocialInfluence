@@ -34,7 +34,7 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
         match n_step:
             case 3 | 4 | 5:
                 clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)
-                clairvoyant_margin_values = np.repeat(clairvoyant_margin_values, iteration).astype(np.float64)
+                #clairvoyant_margin_values = np.repeat(clairvoyant_margin_values, iteration).astype(np.float64)
                 if debug:
                     print("\nReward clairvoyant: ", clairvoyant_margin_values)
                 clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
@@ -80,15 +80,15 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
                        day=iteration)
 
     delta_reward = np.subtract(np.max(clairvoyant_margin_values,axis=0),np.mean(cumulative_reward,axis=0))
-    upper_bound_regret_list = []
+    upper_bound_regrets = []
 
     c1 = 4 * np.log(learner.t)
     for val in delta_reward:
         if val > 0:
             x = (c1 / val) + (8 * val)
-            upper_bound_regret_list.append(x)
+            upper_bound_regrets.append(x)
 
-    upper_bound_regret = np.sum(np.array(upper_bound_regret_list))
+    upper_bound_regret = np.sum(np.array(upper_bound_regrets))
 
     ratio = np.mean(cumulative_regret, axis=0)[-1] / upper_bound_regret
     return ratio

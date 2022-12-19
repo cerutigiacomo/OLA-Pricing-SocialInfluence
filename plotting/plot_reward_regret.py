@@ -36,7 +36,7 @@ def plot_regret_reward(cumulative_regret,
 
     ax[1].plot(mean_reward, color='blue', label=label_alg)
     ax[1].fill_between(range(day), mean_reward - stdev_reward, mean_reward + stdev_reward, alpha=0.4)
-    ax[1].plot(best_revenue, color='red', linestyle='--', label='Clairvoyant')
+    ax[1].plot(best_revenue_array, color='red', linestyle='--', label='Clairvoyant')
     for change in changes:
         ax[1].axvline(change, color="darkviolet", lw=3)
     ax[1].set_title('Reward')
