@@ -12,7 +12,7 @@ prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA
 users = get_users(class_choosed)
 iteration = 100
-daily_simulation = 10
+daily_simulation = 150
 
 
 conv_rates_aggregated = users[0].conv_rates

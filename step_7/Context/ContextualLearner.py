@@ -43,8 +43,8 @@ class ContextualLearner(Learner):
                 if go_right:
                     cur_node = cur_node.right_child
                 else:
-                    raise NotImplementedError("An error occurs: neither the left and the right child are compliant "
-                                              "with the given features.")
+                    print("ERROR")
+
         return cur_node.base_learner
 
     def print_context_tree(self):

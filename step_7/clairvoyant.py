@@ -39,48 +39,31 @@ def find_clairvoyant_indexes(conv_rates_aggregated):
     return best_margin_for_unit, clairvoyant_margin_values
 
 
-def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation, plot=False):
-    # TODO review
-    y_clairvoyant = 0
+def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation):
     rew = np.zeros(daily_simulation)
     for i in range(daily_simulation):
         reward, product_visited, items_bought, items_rewards = env.round(clairvoyant_price_index)
         reward = np.sum(reward)
         rew[i] = reward
-        y_clairvoyant = ((y_clairvoyant*i) + reward) / (i+1)
-    # y_clairvoyant = mean of the reward of the clairvoyant
-    y_clairvoyant = np.max(rew)
-
-    if plot:
-        x_labels = learner.list_prices
-        margin = learner.list_margins
-
-        x_values = [i for i in range(x_labels.shape[0])]
-
-        fig = plt.figure(1, figsize=(70, 12))
-        plt.plot(x_values, margin)
-        plt.xticks(ticks=x_values, labels=x_labels, rotation=90)
-        plt.plot(x_values, np.repeat(y_clairvoyant, len(x_values)), "r-")
-        plt.grid()
-        plt.show()
-
-    return y_clairvoyant
+    return np.max(rew)
 
 
 def find_not_aggregated_reward(best_arm_per_class, env):
     total_reward = 0
+    tot_2 = np.zeros(len(env.users_indexes))
     for i in env.users_indexes:
-        total_reward += data["users"]["classes"][i]["fraction_between_other_classes"] * \
-                        find_reward_per_class(best_arm_per_class[i], i, env)
+        tot_2[i] += find_reward_per_class(best_arm_per_class[i], i, env)
+        total_reward += tot_2[i] # data["users"]["classes"][i]["fraction_between_other_classes"] * tot_2[i]
 
     # TODO find the best reward for the not aggregated case
     return total_reward
 
 
 def find_reward_per_class(arm, user_class, env):
-    iteration = 20
+    iteration = env.daily_iteration_mean
     rew = np.zeros(iteration)
-    environment = Environment(env.n_arms, env.prices, env.prices, arm, [user_class])
+    # in this env we only iterate 1 time for not loosing the max reward on the mean
+    environment = Environment(env.n_arms, env.prices, env.prices, arm, [user_class], 0)
     for i in range(iteration):
         reward, product_visited, items_bought, items_rewards = environment.round(arm)
         reward = np.sum(reward)

@@ -1,29 +1,23 @@
+import numpy as np
+
 from simulator import Simulator
 from website_simulation import *
 
 debug = True
 
 
-def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
+def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step, repeat=False):
     match n_step:
         case 3:
             # STEP 3
-            # unknown : conversion rates
-            # known : alpha ratios, number of items bought, graph weights
             users = update_users_conv_rates(users, estimated_conv_rates)
-
-                # STEP 4-5
-                # edit n_bought to a fixed maximum ?
-                # user.alpha = compute_sample_alpha_ratios()
-                # edit alpha ratios
-                # edit graph weights
 
             return users
 
         case 4:
             # STEP 4
             users = update_users_conv_rates(users, estimated_conv_rates)
-            users = update_users_alpha_ratios(users, product_visited)
+            users = update_users_alpha_ratios(users, product_visited, repeat)
             users = update_users_max_bought(users, items_bought)
             pass
         case 5:
@@ -43,12 +37,16 @@ def update_users_conv_rates(users, estimated_conv_rates):
                     user.conv_rates[prod, arm] = estimated_conv_rates[prod, arm]
     return users
 
-def update_users_alpha_ratios(users, product_visited):
+def update_users_alpha_ratios(users, product_visited, repeat=False):
     products_count = np.zeros(numbers_of_products+1)
     products_count[0] = 0.1
     for element in product_visited:
         prod = element[0]
-        products_count[prod+1] += 1
+        if repeat:
+            for i in range(numbers_of_products):
+                products_count[i+1] += element[i]
+        else:
+            products_count[prod+1] += 1
 
     products_count[1:] = products_count[1:] / len(product_visited)
 
@@ -89,7 +87,14 @@ def update_users_max_bought(users, items_bought):
 
 
 def update_users_graph_weights(users, product_visited):
-    products_count, products_count_view = retrieve_items_count(product_visited)
+    graph = np.zeros((numbers_of_products, numbers_of_products))
+    products_count = np.zeros((numbers_of_products, numbers_of_products))
+    products_count_view = np.zeros(numbers_of_products)
+    for element in product_visited:
+        prod = element[0]
+        products_count_view[prod] += 1
+        for visited in element:
+            products_count[prod, visited] += 1
 
     # Scale the graph weights
     for prod in range(numbers_of_products):
@@ -120,7 +125,8 @@ class Learner:
         # data disaggregation is going to be set before this function
         # Users are reloaded since we could change the properties.
 
-
+        self.pulled_per_arm = np.zeros((n_products, n_prices))
+        self.success_by_arm = np.zeros((n_products, n_prices))
         self.t = 1
         self.prices_index = np.array([0 for i in range(n_products)])
         self.n_products = n_products
@@ -149,7 +155,11 @@ class Learner:
         # select the next arm to be pulled
         pass
 
-    def update(self, price_pulled, reward, visited_products, num_bought_products):
+    def update(self, pulled_arm, reward, visited_products, n_bought_products):
+        if not debug:
+            print("pulled_arm: ", pulled_arm,
+                  "reward: ", np.sum(reward))
+
         # update observation list once reward is returned
         self.t += 1
         self.list_prices = np.append(self.list_prices, str(self.prices_index))
@@ -157,36 +167,32 @@ class Learner:
 
 
         num_products = np.zeros(self.n_products)
-        for i in range(len(num_bought_products[0])):
+        for i in range(len(n_bought_products[0])):
             for j in range(self.n_products):
-                if num_bought_products[0][i][j] != 0:
+                if n_bought_products[0][i][j] != 0:
                     num_products[j] += 1
 
-        num_product = len(price_pulled)
-
-
-
-        if not isinstance(price_pulled[0], list):
-            self.prices_index = price_pulled
+        if not isinstance(pulled_arm[0], list):
+            self.prices_index = pulled_arm
             for prod in range(self.n_products):
                 if num_products[prod] == 0:
-                    self.rewards_per_arm[prod][price_pulled[prod]].append(0)
+                    self.rewards_per_arm[prod][pulled_arm[prod]].append(0)
                 else:
-                    self.rewards_per_arm[prod][price_pulled[prod]].append(1)
-                    self.boughts_per_arm[prod][price_pulled[prod]].append(num_products[prod])
-            self.pulled.append(price_pulled)
+                    self.rewards_per_arm[prod][pulled_arm[prod]].append(1)
+                    self.boughts_per_arm[prod][pulled_arm[prod]].append(num_products[prod])
+            self.pulled.append(pulled_arm)
         else:
-            if len(price_pulled[0]) == 0:
+            if len(pulled_arm[0]) == 0:
                 return
-            self.prices_index = price_pulled[0][-1]
-            for z in range(len(price_pulled[0])):
+            self.prices_index = pulled_arm[0][-1]
+            for z in range(len(pulled_arm[0])):
                 for prod in range(self.n_products):
                     if num_products[prod] == 0:
-                        self.rewards_per_arm[prod][price_pulled[0][z][prod]].append(0)
+                        self.rewards_per_arm[prod][pulled_arm[0][z][prod]].append(0)
                     else:
-                        self.rewards_per_arm[prod][price_pulled[0][z][prod]].append(1)
-                        self.boughts_per_arm[prod][price_pulled[0][z][prod]].append(num_products[prod])
-                self.pulled.append(price_pulled)
+                        self.rewards_per_arm[prod][pulled_arm[0][z][prod]].append(1)
+                        self.boughts_per_arm[prod][pulled_arm[0][z][prod]].append(num_products[prod])
+                self.pulled.append(pulled_arm)
 
     def get_number_of_rewards(self):
         tot = 0

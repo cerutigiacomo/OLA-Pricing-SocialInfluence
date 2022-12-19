@@ -1,10 +1,9 @@
 import copy
-import numpy as np
 
-from UCB_7_Learner import UCBLearner as UCB
-from TS_7_Learner import TSLearner as TS
-from step_7.ContextNode import ContextNode
-from step_7.ContextualLearner import ContextualLearner
+from step_7.UCB_7_Learner import UCBLearner as UCB
+from step_7.TS_7_Learner import TSLearner as TS
+from step_7.Context.ContextNode import ContextNode
+from step_7.Context.ContextualLearner import ContextualLearner
 from step_3.sample_values import *
 
 
@@ -69,13 +68,12 @@ class ContextGenerator:
 
         visits = np.zeros(5)
         for i in range(len(visited_products[0])):
-            for j in range(len(visited_products[0][i])):
-                visits[j] += visited_products[0][i][j]
+            if self.collected_visits is None:
+                self.collected_visits = visits
+            else:
+                self.collected_visits = np.vstack((self.collected_visits, visits))
 
-        if self.collected_visits is None:
-            self.collected_visits = visits
-        else:
-            self.collected_visits = np.vstack((self.collected_visits, visits))
+
 
         if self.collected_bought_products is None:
             self.collected_bought_products = num_bought_products
@@ -121,10 +119,12 @@ class ContextGenerator:
         features, values_after_split, right_learners, left_learners = self.iterate_over_features(leaf)
         # now get the max value after the split and the index
         max_value = -1
+        idx = -1
         for i in range(len(values_after_split)):
             temp_max = np.max(values_after_split[i])
             if not np.isinf(temp_max) and temp_max > max_value:
                 max_value = temp_max
+                idx = i
 
         # max_value = np.max(values_after_split)
 
@@ -132,12 +132,6 @@ class ContextGenerator:
         # at the beginning, values will be all inf due to a lack of samples -> NO SPLIT IN THIS CASE!
         if max_value == -1:
             return
-
-        # Checks in which side there is the maximum value (to index the specific feature)
-        idx = -1
-        for i in range(len(values_after_split)):
-            if np.where(values_after_split[i] == max_value)[0] >= 0:
-                idx = i
 
         # check if the value is larger than the value before split
         before_learner = leaf.base_learner
@@ -276,11 +270,7 @@ class ContextGenerator:
         vis = np.expand_dims(visits, axis=0).tolist()
         num_b = np.expand_dims(num_bought, axis=0).tolist()
         num_prim = np.expand_dims(num_primaries, axis=0).tolist()
-        # TODO on the 3rd execution (after
-        #  if i % 14 == 0 and i != 0:
-        #       context_generator.context_generation())
-        #  "pulled_arms" is empty
-        learner.updateHistory(rew, pulled, vis, num_b, num_prim)
+        learner.updateHistory(rew, pulled, vis, num_b, num_prim, repeat=True)
         #for i in range(len(pulled_arms)):
         #    learner.updateHistory(reward[i], pulled_arms[i], visits[i], num_bought[i], num_primaries[i])
 

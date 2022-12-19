@@ -4,7 +4,7 @@ from Learner.clairvoyant import *
 from plotting.plot_reward_regret import *
 from resources.NSEnvironment import NSEnvironment
 
-mean_iteration = 2
+mean_iteration = 5
 def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, name_alg, n_step=3):
 
     global price_pulled, reward_observed, product_visited, items_bought, items_rewards, clairvoyant_margin_values
