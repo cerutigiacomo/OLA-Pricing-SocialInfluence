@@ -47,19 +47,21 @@ def find_clairvoyant_reward_by_simulation(env):
     rewards_tot = np.zeros((numbers_of_products, different_value_of_prices))
 
 
-    N = 100
+    N = 300
 
     for arm in arms:
         sim.prices, sim.margins = get_prices_and_margins(arm)
         sim.prices_index = arm
         for rounds in range(N):
             rewards, *_ = website_simulation(sim,users)
+            #if np.sum(rewards) > np.sum(rewards_tot[np.arange(numbers_of_products), arm]):
             for product in range(numbers_of_products):
                 if rewards[product] > rewards_tot[product,arm[product]]:
                     rewards_tot[product, arm[product]] = rewards[product]
 
-    best_prices = np.argmax(rewards_tot,axis=1)
-    top_revenue = np.sum(rewards_tot[np.arange(numbers_of_products),best_prices])
+    #rewards_tot = rewards_tot/N
+    best_prices = np.argmax(rewards_tot, axis=1)
+    top_revenue = np.sum(rewards_tot[np.arange(numbers_of_products), best_prices])
     return best_prices, top_revenue
 
 def find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation, plot=False):

@@ -1,8 +1,9 @@
 import scipy.special
 
 from Learner.clairvoyant import *
+from plotting.plot_reward_regret import plot_regret_reward
 from resources.Environment import Environment
-from step_3.iterate_env import iterate
+from step_3.iterate_env import iterate, compute_ratio_regret
 
 
 def enumerate_price_products(conv_rate, wdt):
@@ -38,7 +39,7 @@ learner = UCBLearner(lamb, secondary, [0], 4)
 for i in range(len(class_choosed)):
     learner.users[i].conv_rates = npr.rand(numbers_of_products, different_value_of_prices)
 
-iteration = 150
+iteration = 100
 daily_interaction = 50
 
 #final_reward= np.zeros(iteration)
@@ -46,7 +47,39 @@ daily_interaction = 50
 #cumulative_reward = np.zeros(iteration)
 
 env = Environment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, get_users(class_choosed))
-iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+cumulative_regret1_, cumulative_reward1, final_reward1, clairvoyant_margin_values1  = iterate(learner, env, iteration, daily_interaction, clairvoyant_price_index, "step3UCB", 3)
+
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(12, 8))
+
+repetition = final_reward1.shape[0]
+
+clairvoyant_margin_values = np.tile(clairvoyant_margin_values1,(repetition,1))
+cumulative_clairvoyant = np.cumsum(clairvoyant_margin_values, axis=1)
+
+cumulative_regret1 = np.subtract(cumulative_clairvoyant, cumulative_reward1)
+
+name_alg1 = "step3UCB"
+color_alg1 = "blue"
+
+plot_regret_reward(cumulative_regret1,
+                   cumulative_reward1,
+                   final_reward1,
+                   clairvoyant_margin_values,
+                   changes=[],
+                   label_alg=name_alg1,
+                   color_alg=color_alg1,
+                   ax=axs,
+                   day=iteration)
+
+ratio1 = compute_ratio_regret(learner, clairvoyant_margin_values, final_reward1, cumulative_regret1)
+
+
+for ax in axs:
+    ax.legend(loc='upper right')
+    ax.grid()
+plt.show()
+
+print(ratio1)
 
 
 rewards = learner.means
@@ -60,9 +93,9 @@ x_values = np.arange(len(pp))
 colors = ["r","g","b","y","m"]
 for x in x_values:
     plt.scatter(x,pp[x][2],color=colors[pp[x][0]])
-    plt.scatter(x,conv_rates_aggregated.flatten()[x],color="m",marker="x")
+    plt.scatter(x,conv_rates_aggregated.flatten()[x],color="m",marker="x",zorder=1)
     #plt.vlines(x=x,ymin=pp[x][2]-pp[x][3],ymax=pp[x][2]+pp[x][3],colors=colors[pp[x][0]])
-    plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]],capsize=3)
+    plt.errorbar(x=x,y=pp[x][2],yerr=pp[x][3],color=colors[pp[x][0]], capsize=5, lw=6, alpha=0.25)
 plt.xticks(x_values)
 plt.ylim(-2, 3)
 plt.grid()

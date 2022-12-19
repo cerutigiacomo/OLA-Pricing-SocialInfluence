@@ -33,12 +33,12 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
 
         match n_step:
             case 3 | 4 | 5:
-                clairvoyant_margin_values = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)
-                clairvoyant_margin_values = np.repeat(clairvoyant_margin_values, iteration).astype(np.float64)
+                clairvoyant_margin_value = find_clairvoyant_reward(learner, env, clairvoyant_price_index, daily_simulation)
+                #clairvoyant_margin_values = np.repeat(clairvoyant_margin_value, iteration).astype(np.float64)
                 if debug:
                     print("\nReward clairvoyant: ", clairvoyant_margin_values)
-                clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_values)
-
+                clairvoyant_margin_iterated = np.full(iteration, clairvoyant_margin_value)
+                clairvoyant_margin_values = clairvoyant_margin_iterated
                 # TODO to be adapted with changes
                 changes = []
             case 6:
@@ -59,7 +59,7 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
                     env_test.users = users
                     #clairvoyant_margin_value = find_clairvoyant_reward(learner, env_test, clairvoyant_price_index, daily_simulation)
                     clairvoyant_indexes, clairvoyant_margin_value = find_clairvoyant_reward_by_simulation(env_test)
-
+                    clairvoyant_margin_value = (clairvoyant_margin_value + learner.top_reward) / 2
                     clairvoyant_margin_iterated[t:t_change] = np.repeat(clairvoyant_margin_value, t_change-t)
                     t = t_change
                 clairvoyant_margin_values = clairvoyant_margin_iterated
@@ -69,26 +69,23 @@ def iterate(learner, env, iteration, daily_simulation, clairvoyant_price_index, 
         cumulative_regret[z, :] = np.cumsum(clairvoyant_margin_iterated) - np.cumsum(learner.list_margins)
         final_reward[z, :] = learner.list_margins
 
+    return cumulative_regret, cumulative_reward, final_reward, clairvoyant_margin_values
 
-    # Plot Regret and Reward
-    plot_regret_reward(cumulative_regret,
-                       cumulative_reward,
-                       final_reward,
-                       clairvoyant_margin_values,
-                       changes=changes,
-                       label_alg=name_alg,
-                       day=iteration)
-
-    delta_reward = np.subtract(np.max(clairvoyant_margin_values,axis=0),np.mean(cumulative_reward,axis=0))
+def compute_ratio_regret(learner, clairvoyant_values, final_rewards, cumulative_regret):
+    ### COMPUTE RATIO REGRET
+    clairvoyant_values = np.mean(clairvoyant_values, axis=0)
+    final_rewards = np.mean(final_rewards, axis=0)
+    delta_reward = np.subtract(clairvoyant_values, final_rewards)
     upper_bound_regret_list = []
-
     c1 = 4 * np.log(learner.t)
     for val in delta_reward:
         if val > 0:
             x = (c1 / val) + (8 * val)
             upper_bound_regret_list.append(x)
-
     upper_bound_regret = np.sum(np.array(upper_bound_regret_list))
+    print("cumulative regret : ", cumulative_regret[-1])
+    print("upper bound regret : ", upper_bound_regret)
+    cumulative_regret = np.mean(cumulative_regret, axis=0)
+    ratio = cumulative_regret[-1] / upper_bound_regret
 
-    ratio = np.mean(cumulative_regret, axis=0)[-1] / upper_bound_regret
     return ratio

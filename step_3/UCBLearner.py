@@ -48,7 +48,12 @@ class UCBLearner(Learner):
             scaled_matrix = (matrix-min)/(max-min)
             return scaled_matrix
 
-        arm = np.argmax(self.widths + scale_min_max(self.expected_rewards), axis=1)
+        term1 = self.widths
+        term2 = scale_min_max(self.expected_rewards)
+        #term3 = (0.25) * (scale_min_max(self.last_expected_rewards))
+
+        #arm = np.argmax(self.widths + scale_min_max(self.expected_rewards), axis=1)
+        arm = np.argmax(term1 + term2, axis=1)
         print("ARM TO BE PULLED : ", arm)
         return arm
         return np.argmax(
@@ -136,8 +141,10 @@ class UCBLearner(Learner):
                 self.sim.prices_index = simulated_super_arm
                 reward, *_ = website_simulation(self.sim, self.users)
                 temp_reward[product, simulated_super_arm[product]] = reward[product]
-
-        self.expected_rewards = (self.expected_rewards + temp_reward) /2
+        if self.t == 0 :
+            self.expected_rewards = temp_reward
+        else :
+            self.expected_rewards = (self.expected_rewards + temp_reward) / 2
         self.last_expected_rewards = temp_reward
 
     def update_boughts(self, price_pulled, product_visited, items_bought):

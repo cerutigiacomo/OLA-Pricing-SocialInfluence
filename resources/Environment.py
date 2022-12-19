@@ -2,7 +2,7 @@ from simulator import *
 from website_simulation import *
 
 class Environment:
-    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users_classes, users, daily_iteration_mean = 35):
+    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users_classes, users, daily_iteration_mean = 10):
         self.n_arms = n_prices
         self.users_indexes = users_classes
         self.users = users

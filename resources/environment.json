@@ -57,7 +57,7 @@
         },
         "total_user": {
           "mean_users_per_class": 30,
-          "user_per_class_std": 5
+          "user_per_class_std": 1
         },
         "demand": {
           "min_demand": 0.3,

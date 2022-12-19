@@ -136,6 +136,8 @@ class Learner:
         # list margins used to fill y-axis with cumulative rewards
         self.list_margins = np.array([])
 
+        self.top_reward = 0
+
     def reset(self):
         self.__init__(self.lamb, self.secondary, self.users_classes, self.n_arms)
 
@@ -150,6 +152,8 @@ class Learner:
         self.prices_index = price_pulled
         self.list_prices = np.append(self.list_prices, str(self.prices_index))
         self.list_margins = np.append(self.list_margins, np.sum(reward))
+        if np.sum(reward) > self.top_reward:
+            self.top_reward = np.sum(reward)
 
     def update_step_parameters(self, product_visited, items_bought, n_step):
         pass
