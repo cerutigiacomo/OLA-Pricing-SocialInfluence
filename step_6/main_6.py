@@ -2,8 +2,7 @@ from Learner.Learner import *
 from Learner.clairvoyant import find_clairvoyant_indexes
 from resources.NSEnvironment import NSEnvironment
 from UCBLearner import UCBLearner
-from iterate_env_6 import iterate
-from step_6.UCBSWLearner import UCBSWLearner
+from step_6_FRA.iterate_env_6 import iterate
 
 
 def enumerate_price_products(conv_rate, wdt):

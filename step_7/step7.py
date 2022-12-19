@@ -14,10 +14,10 @@ data = json.load(f)
 max_item_bought = data["simulator"]["max_item_bought"]
 features = data["users"]["features"]
 debug = True
-PLOT_ITERATION = 3
-DAYS = 90
+PLOT_ITERATION = 1
+DAYS = 100
 SIMULATION_ITERATIONS = 10
-ENVIRONMENT_ITERATIONS = 1
+ENVIRONMENT_ITERATIONS = 35
 
 # Set as False for running the simulation on TS!
 UCB_LEARNER = False
@@ -60,7 +60,7 @@ for k in range (PLOT_ITERATION):
     for i in range(DAYS):
         print("Iteration " + str(k) + ": day " + str(i))
 
-        if i % 3 == 0 and i != 0:
+        if i % 14 == 0 and i != 0:
             context_generator.context_generation()
         rew = np.zeros(numbers_of_products)
         pulled_arms = np.zeros(numbers_of_products)

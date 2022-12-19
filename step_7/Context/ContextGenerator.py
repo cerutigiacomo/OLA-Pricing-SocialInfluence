@@ -78,7 +78,9 @@ class ContextGenerator:
         if self.collected_bought_products is None:
             self.collected_bought_products = num_bought_products
         else:
-            self.collected_bought_products = np.vstack((self.collected_bought_products, num_bought_products))
+            if len(num_bought_products) > 0:
+                if len(num_bought_products[0]) > 0:
+                    self.collected_bought_products = np.vstack((self.collected_bought_products, num_bought_products))
 
         if self.num_primaries is None:
             self.num_primaries = num_primaries
