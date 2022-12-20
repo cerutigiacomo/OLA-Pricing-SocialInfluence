@@ -1,34 +1,23 @@
-import copy
+from Environment6 import *
 
-from resources.Environment import *
-from scipy.stats import beta
 
 class NSEnvironment(Environment):
-    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, user_classes = None, users, changes_instant, same_user_saved_behaviour=None):
-        super().__init__(n_prices, prices, margins, lamb, secondary, prices_index, user_classes, users)
+    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users, changes_instant):
+        super().__init__(n_prices, prices, margins, lamb, secondary, prices_index, users)
         self.t = 0
         self.changes_instant = changes_instant  # list of instant iteration values of abrupt change
 
         # collect user (of each classes with updated convs)
-        self.changes_collector = [(0,copy.deepcopy(self.users))]
-        self.same_user_saved_behaviour = same_user_saved_behaviour
+        self.changes_collector = [(0,self.users)]
+
+    def reset(self):
+        self.__init__(self.n_arms, self.prices, self.sim.margins, self.lam, self.secondary, self.sim.prices_index, self.users_indexes, self.changes_instant)
 
     def round(self, pulled_arm):
         self.t += 1
         if self.t in self.changes_instant:
             print(" ITS TIME TO ABRUPT CHANGE !!!")
-            if self.same_user_saved_behaviour:
-                for t, user in self.same_user_saved_behaviour:
-                    if t == self.t:
-                        new_user = copy.deepcopy(user)
-                        self.users = new_user
-                        self.changes_collector.append((self.t, new_user))
-                        continue
-            else :
-                if self.changes_instant.index(self.t)%2 == 0:
-                    self._abrupt_change_with_changes_collector()
-                else:
-                    self._abrupt_change1()
+            self._abrupt_change_with_changes_collector()
             print(self.changes_collector)
 
         return super().round(pulled_arm)
@@ -48,18 +37,16 @@ class NSEnvironment(Environment):
             conv_rates = npr.uniform(min_demand, max_demand, (numbers_of_products, different_value_of_prices))
             self.users[i].conv_rates = conv_rates
 
-        self.changes_collector.append((self.t, copy.deepcopy(self.users)))
+        self.changes_collector.append((self.t, self.users))
 
     def _abrupt_change_with_changes_collector(self):
         classes_idx = [i for i in range(len(self.users))]
         # Define a maximum value of conversion rates for every user class
-        print("PAST CONV RATES : \n", self.users[0].conv_rates)
         for i in range(len(classes_idx)):
-            randoms = npr.uniform(0.01, 0.3, (numbers_of_products, different_value_of_prices))
-            conv_rates = -np.sort(-randoms)
+            conv_rates = npr.uniform(0.0, 1.0, (numbers_of_products, different_value_of_prices))
             self.users[i].conv_rates = conv_rates
-        print("NEW CONV RATES : \n",self.users[0].conv_rates)
-        self.changes_collector.append((self.t, copy.deepcopy(self.users)))
+
+        self.changes_collector.append((self.t, self.users))
 
     def _abrupt_change(self):
         # Random conversion rate (demand curve) generating number between [0, 1)

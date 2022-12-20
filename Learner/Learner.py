@@ -5,33 +5,32 @@ debug = False
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step):
-    match n_step:
-        case 3:
-            # STEP 3
-            # unknown : conversion rates
-            # known : alpha ratios, number of items bought, graph weights
-            users = update_users_conv_rates(users, estimated_conv_rates)
+    if n_step == 3:
+        # STEP 3
+        # unknown : conversion rates
+        # known : alpha ratios, number of items bought, graph weights
+        users = update_users_conv_rates(users, estimated_conv_rates)
 
-                # STEP 4-5
-                # edit n_bought to a fixed maximum ?
-                # user.alpha = compute_sample_alpha_ratios()
-                # edit alpha ratios
-                # edit graph weights
+            # STEP 4-5
+            # edit n_bought to a fixed maximum ?
+            # user.alpha = compute_sample_alpha_ratios()
+            # edit alpha ratios
+            # edit graph weights
 
-            return users
+        return users
 
-        case 4:
-            # STEP 4
-            users = update_users_conv_rates(users, estimated_conv_rates)
-            users = update_users_alpha_ratios(users, product_visited)
-            users = update_users_max_bought(users, items_bought)
-            pass
-        case 5:
-            # STEP 5
-            users = update_users_graph_weights(users, product_visited)
-            pass
-        case _:
-            raise ValueError()
+    if n_step == 4:
+        # STEP 4
+        users = update_users_conv_rates(users, estimated_conv_rates)
+        users = update_users_alpha_ratios(users, product_visited)
+        users = update_users_max_bought(users, items_bought)
+        pass
+    if n_step == 5:
+        # STEP 5
+        users = update_users_graph_weights(users, product_visited)
+        pass
+    if n_step == _:
+        raise ValueError()
 
     return users
 

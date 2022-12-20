@@ -1,8 +1,11 @@
 from Learner.Learner import *
 from Learner.clairvoyant import find_clairvoyant_indexes
-from resources.NSEnvironment import NSEnvironment
+from NSEnvironment6 import NSEnvironment
 from UCBLearner import UCBLearner
-from step_6_FRA.iterate_env_6 import iterate
+from iterate_env_6 import iterate
+from step_6.UCBSWLearner import UCBSWLearner
+from plotting.plot_reward_regret import *
+
 
 
 def enumerate_price_products(conv_rate, wdt):
@@ -34,17 +37,20 @@ clairvoyant_price_index, clairvoyant_margin_values = find_clairvoyant_indexes(us
 # TODO iterate the learner more times and get the mean of the results
 
 iteration = 10
-daily_interaction = 5
+daily_interaction = 50
 changes_instant = [5]
 
 tau = int(np.sqrt(iteration))
 
-#learner = UCBSWLearner(lamb, secondary, [0], 4, tau)
 learner = UCBLearner(lamb, secondary, [0], 4)
+learnerSW = UCBSWLearner(lamb, secondary, [0], 4, tau)
 env = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
+envSW = NSEnvironment(different_value_of_prices, prices, margins, lamb, secondary, [0, 0, 0, 0, 0], class_choosed, changes_instant)
 
 env.users[0].conv_rates = user_conv_rates
+envSW.users[0].conv_rates = user_conv_rates
 learner.users[0].conv_rates = user_conv_rates
+learnerSW.users[0].conv_rates = user_conv_rates
 
 iterate(user_conv_rates, changes_instant, learner, env, iteration, daily_interaction, clairvoyant_price_index, "step6UCB", 3)
 

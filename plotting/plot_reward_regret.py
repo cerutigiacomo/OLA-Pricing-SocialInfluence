@@ -97,26 +97,44 @@ def plot_regret_reward_split_classes(cumulative_regret,
     plt.show()
 
 def plot_regret_reward_UCB6(cumulative_regret,
-                       cumulative_reward,
-                       final_reward,
-                       best_revenue,
-                       best_revenue_new,
-                       label_alg,
-                       day=days):
+                            cumulative_regretSW,
+                            cumulative_regret_first,
+                            cumulative_regret_second,
+                            cumulative_reward,
+                            cumulative_rewardSW,
+                            final_reward,
+                            final_rewardSW,
+                            best_revenue,
+                            best_revenue_new,
+                            label_alg,
+                            day=days):
     best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
     mean_cumulative_regret, stdev_regret = mean_std(cumulative_regret, day)
+    mean_cumulative_regretSW, stdev_regret = mean_std(cumulative_regretSW, day)
+    mean_cumulative_regret_first, stdev_regret_first = mean_std(cumulative_regret_first, day/2)
+    mean_cumulative_regret_second, stdev_regret_second = mean_std(cumulative_regret_second, day/2)
     mean_cumulative_reward, stdev_cumulative_reward = mean_std(cumulative_reward, day)
+    mean_cumulative_rewardSW, stdev_cumulative_rewardSW = mean_std(cumulative_rewardSW, day)
     mean_reward, stdev_reward = mean_std(final_reward, day)
+    mean_rewardSW, stdev_reward = mean_std(final_rewardSW, day)
 
     fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(12, 8))
-    ax[0].plot(mean_cumulative_regret, color='blue', label=label_alg)
-    ax[0].fill_between(range(day), (mean_cumulative_regret - stdev_regret), (mean_cumulative_regret + stdev_regret),
-                       alpha=0.4)
+
+    ax[0].plot(mean_cumulative_regret, color='blue', label="UCB")
+    ax[0].plot(mean_cumulative_regretSW, color='red', label="SW UCB")
+    #ax[0].plot(mean_cumulative_regret_first, color='red', label=label_alg)
+    #ax[0].plot(mean_cumulative_regret_second, color='green', label=label_alg)
+    #ax[0].plot(mean_cumulative_regret_first, color='red', label=label_alg)
+    #ax[0].plot(mean_cumulative_regret_second, color='green', label=label_alg)
+    ax[0].fill_between(range(day), (mean_cumulative_regret - stdev_regret), (mean_cumulative_regret + stdev_regret), alpha=0.4)
+    #ax[0].axhline(y=mean_cumulative_regret_first, color='red', xmax=0.5, linestyle='--', label='Clairvoyant')
+    #ax[0].axhline(y=mean_cumulative_regret_second, color='green', xmin=0.5, linestyle='--', label='After AC' )
     ax[0].set_title('Cumulative Regret')
     ax[0].legend()
     ax[0].grid()
 
-    ax[1].plot(mean_reward, color='blue', label=label_alg)
+    ax[1].plot(mean_reward, color='blue', label="UCB")
+    ax[1].plot(mean_rewardSW, color='red', label="SW UCB")
     # point for the abrupt change
     # ax[1].plot(0, 25, marker="o", color="red")
     ax[1].fill_between(range(day), mean_reward - stdev_reward, mean_reward + stdev_reward, alpha=0.4)
@@ -126,7 +144,8 @@ def plot_regret_reward_UCB6(cumulative_regret,
     ax[1].legend()
     ax[1].grid()
 
-    ax[2].plot(mean_cumulative_reward, color='blue', label=label_alg)
+    ax[2].plot(mean_cumulative_reward, color='blue', label="UCB")
+    ax[2].plot(mean_cumulative_rewardSW, color='red', label="SW UCB")
     ax[2].fill_between(range(day), mean_cumulative_reward - stdev_cumulative_reward,
                        mean_cumulative_reward + stdev_cumulative_reward, alpha=0.4)
     ax[2].plot(np.cumsum(best_revenue_array), color='red', linestyle='--', label='Clairvoyant')
