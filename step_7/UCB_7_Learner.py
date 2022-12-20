@@ -40,7 +40,7 @@ class UCBLearner(Learner):
         return np.argmax((self.widths + self.means) * (self.expected_rewards + get_all_margins()), axis=1)
         # return np.argmax((self.widths + self.means) * ((get_all_margins()*bought) + self.expected_rewards), axis=1)
 
-    def update_pulled_and_success(self, price_pulled, product_visited, items_bought, items_rewards):
+    def update_pulled_and_success(self, price_pulled, product_visited, items_bought, items_rewards, repeat=False):
 
         estimated_conv_rate = self.estimate_conversion_rates()
 
@@ -49,8 +49,8 @@ class UCBLearner(Learner):
         # TODO : clipping is wrong ?
         estimated_conv_rate = np.clip(estimated_conv_rate, a_min=0, a_max=1)
         self.users = \
-            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited, items_bought,
-                                                 self.step)
+            update_step_parameters_of_simulation(self.users, estimated_conv_rate, product_visited[0], items_bought[0],
+                                                 self.step, repeat=repeat)
 
     def estimate_conversion_rates(self):
         return self.means + self.widths
@@ -111,7 +111,7 @@ class UCBLearner(Learner):
         observed_reward, a, b, c = website_simulation(self.sim, self.users)
         return observed_reward
 
-    def updateHistory(self, reward, arm_pulled, visited_products, num_bought_products, num_primary=None):
+    def updateHistory(self, reward, arm_pulled, visited_products, num_bought_products, num_primary=None, repeat=False):
         super().update(arm_pulled, reward, visited_products, num_bought_products)
 
         num_bought_p = np.zeros(numbers_of_products)
@@ -120,16 +120,14 @@ class UCBLearner(Learner):
                 num_bought_p[j] += num_bought_products[0][i][j]
 
         if not isinstance(arm_pulled[0], list):
-            current_prices = [i[j] for i, j in zip(get_all_margins(), arm_pulled)]
-            current_reward = sum(num_bought_p * np.array(current_prices))
+            current_reward = np.sum(reward.copy())
         else:
             if len(arm_pulled[0]) == 0:
                 return
-            current_prices = [i[j] for i, j in zip(get_all_margins(), arm_pulled[0][-1])]
-            current_reward = sum(num_bought_products[0][-1] * np.array(current_prices))
-
+            current_reward = np.sum(reward.copy())
 
         self.current_reward.append(current_reward)
+        self.update_pulled_and_success(arm_pulled, visited_products, num_bought_products, num_primary, repeat=repeat)
 
     def get_opt_arm_value(self):
         """

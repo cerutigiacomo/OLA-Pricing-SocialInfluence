@@ -90,7 +90,7 @@ class TSLearner(Learner):
         pass
 
 
-    def updateHistory(self, reward, arm_pulled, visited_products, num_bought_products, num_primary=None, repeat=None):
+    def updateHistory(self, reward, arm_pulled, visited_products, num_bought_products, num_primary=None, repeat=False):
         super().update(arm_pulled, reward, visited_products, num_bought_products)
 
         num_bought_p = np.zeros(numbers_of_products)

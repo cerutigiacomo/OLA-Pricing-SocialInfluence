@@ -3,7 +3,7 @@ import numpy as np
 from simulator import Simulator
 from website_simulation import *
 
-debug = True
+debug = False
 
 
 def update_step_parameters_of_simulation(users, estimated_conv_rates, product_visited, items_bought, n_step, repeat=False):
@@ -17,7 +17,7 @@ def update_step_parameters_of_simulation(users, estimated_conv_rates, product_vi
         case 4:
             # STEP 4
             users = update_users_conv_rates(users, estimated_conv_rates)
-            users = update_users_alpha_ratios(users, product_visited, repeat)
+            users = update_users_alpha_ratios(users, product_visited, repeat=repeat)
             users = update_users_max_bought(users, items_bought)
             pass
         case 5:
@@ -156,7 +156,7 @@ class Learner:
         pass
 
     def update(self, pulled_arm, reward, visited_products, n_bought_products):
-        if not debug:
+        if debug:
             print("pulled_arm: ", pulled_arm,
                   "reward: ", np.sum(reward))
 

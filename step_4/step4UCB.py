@@ -20,7 +20,7 @@ debug = False
 fixed_maximum = 4
 class_choosed = [0]
 iteration = 100
-daily_interaction = 30
+daily_interaction = 50
 
 prices, margins, secondary, today = simulator_distribution()
 lamb = data["product"]["lambda"]  # LAMBDA

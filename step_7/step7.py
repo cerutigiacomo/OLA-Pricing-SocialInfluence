@@ -17,10 +17,10 @@ debug = True
 PLOT_ITERATION = 1
 DAYS = 100
 SIMULATION_ITERATIONS = 10
-ENVIRONMENT_ITERATIONS = 35
+ENVIRONMENT_ITERATIONS = 4
 
 # Set as False for running the simulation on TS!
-UCB_LEARNER = False
+UCB_LEARNER = True
 
 
 final_reward= np.zeros((PLOT_ITERATION, DAYS))
