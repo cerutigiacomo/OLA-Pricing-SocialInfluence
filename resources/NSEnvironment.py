@@ -4,7 +4,7 @@ from resources.Environment import *
 from scipy.stats import beta
 
 class NSEnvironment(Environment):
-    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, user_classes = None, users, changes_instant, same_user_saved_behaviour=None):
+    def __init__(self, n_prices, prices, margins, lamb, secondary, prices_index, users, changes_instant, user_classes = None, same_user_saved_behaviour=None):
         super().__init__(n_prices, prices, margins, lamb, secondary, prices_index, user_classes, users)
         self.t = 0
         self.changes_instant = changes_instant  # list of instant iteration values of abrupt change

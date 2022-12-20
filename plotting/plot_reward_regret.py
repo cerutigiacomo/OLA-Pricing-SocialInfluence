@@ -108,7 +108,9 @@ def plot_regret_reward_UCB6(cumulative_regret,
                             best_revenue_new,
                             label_alg,
                             day=days):
-    best_revenue_array = np.repeat(best_revenue, day).astype(np.float64)
+    best_revenue_array = np.repeat(best_revenue,day/2).astype(np.float64)
+    best_revenueAC_array = np.concatenate([best_revenue_array, np.repeat(best_revenue_new, day/2).astype(np.float64)])
+
     mean_cumulative_regret, stdev_regret = mean_std(cumulative_regret, day)
     mean_cumulative_regretSW, stdev_regret = mean_std(cumulative_regretSW, day)
     mean_cumulative_regret_first, stdev_regret_first = mean_std(cumulative_regret_first, day/2)
@@ -149,6 +151,7 @@ def plot_regret_reward_UCB6(cumulative_regret,
     ax[2].fill_between(range(day), mean_cumulative_reward - stdev_cumulative_reward,
                        mean_cumulative_reward + stdev_cumulative_reward, alpha=0.4)
     ax[2].plot(np.cumsum(best_revenue_array), color='red', linestyle='--', label='Clairvoyant')
+    ax[2].plot(np.cumsum(best_revenueAC_array), color='green', linestyle='--', label='ClairvoyantAC')
     ax[2].set_title('Cumulative reward')
     ax[2].legend()
     ax[2].grid()
